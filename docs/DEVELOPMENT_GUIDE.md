@@ -171,6 +171,16 @@ Backend production settings (the server refuses to start without them): `NODE_EN
 
 Cloudflare Access setup (one time): Zero Trust → Access → Applications → *Self-hosted* → domain `admin.<domain>` → policy *Allow* for your admins' emails → copy the **AUD tag** → set `ACCESS_AUD`; your team domain is `ACCESS_TEAM_DOMAIN`. Do **not** put the public form endpoints behind Access.
 
+### 7.1 Vercel behind Cloudflare (backend prepared, **not deployed**)
+
+The backend is ready to run as a Vercel function: `backend/api/index.js` exports the Express app, `backend/vercel.json` rewrites `/api/*` to it (15 s max, 512 MB), `backend/.vercelignore` keeps secrets and tests out of the upload, and `engines.node` is `24.x`. In the Vercel project set **Root Directory = `backend`**.
+
+Vercel terminates the connection, so the TCP peer is Vercel, not Cloudflare. The client IP therefore uses `CLIENT_IP_SOURCE=vercel-cloudflare`: `CF-Connecting-IP` is trusted only if (1) `X-Vercel-Forwarded-For` (set by Vercel, not overridable by clients) is a Cloudflare edge address and (2) `X-Origin-Auth` equals `ORIGIN_AUTH_SECRET`. Create the second part in Cloudflare: *Rules → Transform Rules → Modify Request Header → Set static* `X-Origin-Auth` = the secret, for the API hostname. Direct hits on `*.vercel.app`, and other Cloudflare accounts proxying to it, get 403.
+
+Vercel environment variables: everything in the production list above, with `CLIENT_IP_SOURCE=vercel-cloudflare`, `ORIGIN_AUTH_SECRET`, a **pooled** Neon `DATABASE_URL` (`-pooler` host, `sslmode=verify-full`) and `DB_POOL_MAX=2`. Run migrations from a workstation against Neon's direct (non-pooled) host, never from the function. Cloudflare: SSL mode *Full (strict)*; keep Access on the admin path only, never on the public form paths.
+
+Verify on the first **preview** deployment (cannot be proven offline): that Express receives the original `/api/v1/...` path after the rewrite, and that the Cloudflare headers arrive (`GET /api/health` through Cloudflare returns 200, directly on `*.vercel.app` returns 403).
+
 Frontend hosting needs a strict content-security policy such as `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; frame-ancestors 'none'` (the build has no inline scripts, which the integration suite checks).
 
 **Still to do before the first deployment** (deliberately not started): run the Hyperdrive work for Cloudflare Workers (per-request `pg` client instead of a global pool, configuration from Workers bindings instead of `.env`, a Hyperdrive-aware TLS check, and confirming in staging that `CF-Connecting-IP` / `X-Forwarded-Proto` reach Express); apply the migrations to the production database (**snapshot row counts and checksums before and after**; the migration rehearsal test shows what to expect).

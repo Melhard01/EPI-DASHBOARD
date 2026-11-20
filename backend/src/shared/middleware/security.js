@@ -42,9 +42,9 @@ export function securityHeaders({ hsts }) {
  * Resolves the trusted client IP into req.clientIp (see security/clientIp.js).
  * Requests that bypass Cloudflare in a Cloudflare mode are rejected here.
  */
-export function clientIdentity({ source }) {
+export function clientIdentity({ source, originSecret = null }) {
   return function identifyClient(req, res, next) {
-    req.clientIp = resolveClientIp(req, source);
+    req.clientIp = resolveClientIp(req, source, { originSecret });
     next();
   };
 }
@@ -55,9 +55,9 @@ export function clientIdentity({ source }) {
  * request, including any body, in plaintext, and would teach clients that
  * HTTP "works". A hard failure surfaces misconfigured clients immediately.
  */
-export function requireHttps({ source }) {
+export function requireHttps({ source, originSecret = null }) {
   return function enforceHttps(req, res, next) {
-    if (!isSecureRequest(req, source)) {
+    if (!isSecureRequest(req, source, { originSecret })) {
       return next(new AppError('HTTPS is required', 403));
     }
     return next();

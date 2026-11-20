@@ -109,7 +109,17 @@ export function loadEnv(source) {
     throw new Error(`Invalid CLIENT_IP_SOURCE "${clientIpSource}". Expected one of: ${CLIENT_IP_SOURCES.join(', ')}`);
   }
   if (isProduction && clientIpSource === ClientIpSource.SOCKET) {
-    throw new Error('Production must run behind Cloudflare: set CLIENT_IP_SOURCE to cloudflare-worker or cloudflare-proxy');
+    throw new Error('Production must run behind Cloudflare: set CLIENT_IP_SOURCE to cloudflare-worker, cloudflare-proxy or vercel-cloudflare');
+  }
+
+  // Vercel behind Cloudflare: a secret that a Cloudflare Transform Rule adds as the
+  // X-Origin-Auth header, proving the request came through our own Cloudflare zone.
+  const originAuthSecret = source.ORIGIN_AUTH_SECRET || null;
+  if (originAuthSecret !== null && originAuthSecret.length < MIN_SECRET_LENGTH) {
+    throw new Error(`ORIGIN_AUTH_SECRET must be at least ${MIN_SECRET_LENGTH} characters`);
+  }
+  if (isProduction && clientIpSource === ClientIpSource.VERCEL_CLOUDFLARE && !originAuthSecret) {
+    throw new Error('CLIENT_IP_SOURCE=vercel-cloudflare requires ORIGIN_AUTH_SECRET in production');
   }
 
   // --- Rate limiting ----------------------------------------------------
@@ -183,6 +193,7 @@ export function loadEnv(source) {
     databaseUrl,
     dbPoolMax: parsePositiveInt(source.DB_POOL_MAX, 5, 'DB_POOL_MAX'),
     clientIpSource,
+    originAuthSecret,
     // HTTPS is mandatory in production and cannot be switched off there.
     enforceHttps: isProduction,
     rateLimitStore,

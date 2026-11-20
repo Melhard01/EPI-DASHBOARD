@@ -87,6 +87,7 @@ function createDefaultRateLimitStore() {
 export function createApp(options = {}) {
   const settings = {
     clientIpSource: options.clientIpSource ?? env.clientIpSource,
+    originAuthSecret: options.originAuthSecret !== undefined ? options.originAuthSecret : env.originAuthSecret,
     enforceHttps: options.enforceHttps ?? env.enforceHttps,
     rateLimitStore:
       options.rateLimitStore !== undefined ? options.rateLimitStore : createDefaultRateLimitStore(),
@@ -102,6 +103,9 @@ export function createApp(options = {}) {
     if (!settings.rateLimitStore) throw new Error('Rate limiting cannot be disabled in production');
     if (settings.clientIpSource === ClientIpSource.SOCKET) {
       throw new Error('Production must use a Cloudflare client IP source');
+    }
+    if (settings.clientIpSource === ClientIpSource.VERCEL_CLOUDFLARE && !settings.originAuthSecret) {
+      throw new Error('Production on Vercel requires ORIGIN_AUTH_SECRET');
     }
     if (!settings.accessVerifier) {
       throw new Error('Production requires Cloudflare Access verification for the admin API');
@@ -126,9 +130,9 @@ export function createApp(options = {}) {
   app.use(requestId);
   app.use(securityHeaders({ hsts: settings.enforceHttps }));
   app.use(requestLogger);
-  app.use(clientIdentity({ source: settings.clientIpSource }));
+  app.use(clientIdentity({ source: settings.clientIpSource, originSecret: settings.originAuthSecret }));
   if (settings.enforceHttps) {
-    app.use(requireHttps({ source: settings.clientIpSource }));
+    app.use(requireHttps({ source: settings.clientIpSource, originSecret: settings.originAuthSecret }));
   }
   // CORS: answers preflights, adds headers for allowed origins (see cors.js).
   app.use(cors({ apiBase: API_BASE }));

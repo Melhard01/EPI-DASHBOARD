@@ -1,0 +1,9 @@
+# Never uploaded to Vercel (it builds from the repository / CLI upload).
+.env
+.env.*
+!.env.example
+.dev-access/
+node_modules/
+tests/
+scripts/
+*.log

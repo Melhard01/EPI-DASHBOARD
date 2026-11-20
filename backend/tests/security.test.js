@@ -11,7 +11,7 @@ import path from 'node:path';
 import { createApp } from '../src/app.js';
 import { loadEnv, assertSecureDatabaseUrl } from '../src/shared/config/env.js';
 import { parseIp, createCidrMatcher, rateLimitSubject } from '../src/shared/security/ipAddress.js';
-import { resolveClientIp, isSecureRequest } from '../src/shared/security/clientIp.js';
+import { resolveClientIp, isSecureRequest, ORIGIN_AUTH_HEADER } from '../src/shared/security/clientIp.js';
 import { database } from '../src/shared/database/index.js';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -126,6 +126,75 @@ describe('client IP resolution', () => {
         JSON.stringify(value),
       );
     }
+  });
+
+  describe('vercel-cloudflare mode', () => {
+    const SECRET = 's'.repeat(40);
+    const via = (peer, extra = {}) =>
+      fakeReq('127.0.0.1', { 'x-vercel-forwarded-for': peer, 'cf-connecting-ip': '198.51.100.1', ...extra });
+
+    test('trusts CF-Connecting-IP when Vercel reports a Cloudflare edge peer and the secret matches', () => {
+      const opts = { originSecret: SECRET };
+      assert.equal(resolveClientIp(via(CF_EDGE, { [ORIGIN_AUTH_HEADER]: SECRET }), 'vercel-cloudflare', opts), '198.51.100.1');
+      assert.equal(
+        resolveClientIp(via(CF_EDGE_V6, { [ORIGIN_AUTH_HEADER]: SECRET, 'cf-connecting-ip': '2001:db8::5' }), 'vercel-cloudflare', opts),
+        '2001:db8::5',
+      );
+    });
+
+    test('rejects a direct hit on the Vercel address (peer is not Cloudflare) even with a spoofed header', () => {
+      for (const peer of ['203.0.113.9', '127.0.0.1', '10.0.0.1', '2001:db8::1']) {
+        assert.throws(
+          () => resolveClientIp(via(peer, { [ORIGIN_AUTH_HEADER]: SECRET }), 'vercel-cloudflare', { originSecret: SECRET }),
+          (err) => err.statusCode === 403,
+          peer,
+        );
+      }
+      assert.throws(
+        () => resolveClientIp(fakeReq(CF_EDGE, { 'cf-connecting-ip': '198.51.100.1' }), 'vercel-cloudflare', {}),
+        (err) => err.statusCode === 403,
+        'the TCP peer and X-Forwarded-For are never used in this mode',
+      );
+      assert.throws(
+        () => resolveClientIp(fakeReq('127.0.0.1', { 'x-forwarded-for': CF_EDGE, 'cf-connecting-ip': '198.51.100.1' }), 'vercel-cloudflare', {}),
+        (err) => err.statusCode === 403,
+      );
+    });
+
+    test('rejects a missing, wrong, repeated or differently-sized origin secret', () => {
+      const opts = { originSecret: SECRET };
+      for (const value of [undefined, '', 'wrong', SECRET + 'x', SECRET.slice(1), `${SECRET}, ${SECRET}`]) {
+        const headers = value === undefined ? {} : { [ORIGIN_AUTH_HEADER]: value };
+        assert.throws(
+          () => resolveClientIp(via(CF_EDGE, headers), 'vercel-cloudflare', opts),
+          (err) => err.statusCode === 403,
+          JSON.stringify(value),
+        );
+      }
+    });
+
+    test('without a configured secret the edge-peer check alone applies (non-production)', () => {
+      assert.equal(resolveClientIp(via(CF_EDGE), 'vercel-cloudflare', {}), '198.51.100.1');
+    });
+
+    test('an invalid or duplicated CF-Connecting-IP is rejected with 400', () => {
+      for (const value of [undefined, '', 'abc', '1.2.3.4, 5.6.7.8']) {
+        const headers = { [ORIGIN_AUTH_HEADER]: SECRET };
+        const req = fakeReq('127.0.0.1', { 'x-vercel-forwarded-for': CF_EDGE, ...headers, ...(value === undefined ? {} : { 'cf-connecting-ip': value }) });
+        assert.throws(() => resolveClientIp(req, 'vercel-cloudflare', { originSecret: SECRET }), (err) => err.statusCode === 400, JSON.stringify(value));
+      }
+    });
+
+    test('X-Forwarded-Proto is trusted only on a verified Cloudflare request', () => {
+      const opts = { originSecret: SECRET };
+      const good = via(CF_EDGE, { [ORIGIN_AUTH_HEADER]: SECRET, 'x-forwarded-proto': 'https' });
+      const noSecret = via(CF_EDGE, { 'x-forwarded-proto': 'https' });
+      const direct = via('203.0.113.9', { [ORIGIN_AUTH_HEADER]: SECRET, 'x-forwarded-proto': 'https' });
+      assert.equal(isSecureRequest(good, 'vercel-cloudflare', opts), true);
+      assert.equal(isSecureRequest(noSecret, 'vercel-cloudflare', opts), false);
+      assert.equal(isSecureRequest(direct, 'vercel-cloudflare', opts), false);
+      assert.equal(isSecureRequest(via(CF_EDGE, { [ORIGIN_AUTH_HEADER]: SECRET, 'x-forwarded-proto': 'http' }), 'vercel-cloudflare', opts), false);
+    });
   });
 
   test('unknown modes fail loudly', () => {
@@ -337,6 +406,17 @@ describe('production configuration rules', () => {
     assert.equal(cfg.enforceHttps, true);
     assert.equal(cfg.rateLimitStore, 'postgres');
     assert.equal(cfg.clientIpSource, 'cloudflare-worker');
+  });
+
+  test('Vercel behind Cloudflare: loads only with a strong ORIGIN_AUTH_SECRET', () => {
+    const vercel = { ...valid, CLIENT_IP_SOURCE: 'vercel-cloudflare' };
+    assert.throws(() => loadEnv(vercel), /ORIGIN_AUTH_SECRET/);
+    assert.throws(() => loadEnv({ ...vercel, ORIGIN_AUTH_SECRET: 'short' }), /at least 32/);
+    const cfg = loadEnv({ ...vercel, ORIGIN_AUTH_SECRET: 'o'.repeat(32) });
+    assert.equal(cfg.clientIpSource, 'vercel-cloudflare');
+    assert.equal(cfg.originAuthSecret, 'o'.repeat(32));
+    // other Cloudflare modes do not require it
+    assert.equal(loadEnv(valid).originAuthSecret, null);
   });
 
   test('HTTPS enforcement is always on in production and off locally', () => {

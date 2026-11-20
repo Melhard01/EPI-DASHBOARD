@@ -53,7 +53,8 @@ Loaded from the environment (a local `.env` is read for development; real variab
 | `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD` | — | Cloudflare Access team domain and application AUD tag |
 | `ADMIN_ALLOWED_ORIGINS` | — | the dashboard's origin(s), comma-separated; production `https` only |
 | `CORS_ORIGINS_EPINEON`, `_QAEGIS`, `_EPIWELL` | — | each website's own origin(s) |
-| `CLIENT_IP_SOURCE` | `socket` | `socket` (local), `cloudflare-worker`, `cloudflare-proxy`; production requires a `cloudflare-*` value |
+| `CLIENT_IP_SOURCE` | `socket` | `socket` (local), `cloudflare-worker`, `cloudflare-proxy`, `vercel-cloudflare` (Vercel behind Cloudflare); production requires one of the last three |
+| `ORIGIN_AUTH_SECRET` | — | 32+ characters; **required in production with `vercel-cloudflare`**. A Cloudflare Transform Rule sends it as the `X-Origin-Auth` header |
 | `RATE_LIMIT_STORE` | `postgres` if a database is set | `postgres` (required in production) or `memory` |
 | `RATE_LIMIT_SECRET` | random per process (dev) | 32+ characters, hashes client IPs; required in production |
 | `BODY_LIMIT` | `100kb` | maximum JSON body |
@@ -116,7 +117,7 @@ Import rules, enforced by `tests/isolation.test.js`: a website imports only itse
 ## Security
 
 - **Rate limiting** — Postgres-backed and atomic (one `INSERT … ON CONFLICT` per request), per website, per form and per client; IPs are stored only as HMACs (IPv6 grouped by /64). Over the limit: `429` with `Retry-After` and `RateLimit-*` headers. If the store is down the endpoint fails closed (`503`).
-- **Client IP** — never from `X-Forwarded-For`. `CLIENT_IP_SOURCE=cloudflare-worker` trusts `CF-Connecting-IP`; `cloudflare-proxy` trusts it only from Cloudflare's published edge ranges.
+- **Client IP** — never from `X-Forwarded-For`. `CLIENT_IP_SOURCE=cloudflare-worker` trusts `CF-Connecting-IP`; `cloudflare-proxy` trusts it only from Cloudflare's published edge ranges; `vercel-cloudflare` trusts it only when Vercel's own `X-Vercel-Forwarded-For` shows a Cloudflare edge peer **and** `X-Origin-Auth` matches `ORIGIN_AUTH_SECRET`, so a direct hit on `*.vercel.app` (or another Cloudflare account) is refused with 403.
 - **Origins / CORS** — each website may call only its own form endpoints; origins are *enforced*, not just advertised (unified endpoint included). Admin changes must come from an allowed dashboard origin.
 - **Spam** — per-form honeypot and timing checks; both fail silently and store nothing.
 - **Admin authentication** — Cloudflare Access JWT verified here (RS256 signature by `kid`, issuer, audience, expiry), then authorized per website from `platform_admin`; disabling an admin takes effect on the next request. Lists, statistics and single-record routes only ever build SQL from the websites the caller may use.
@@ -127,8 +128,8 @@ Import rules, enforced by `tests/isolation.test.js`: a website imports only itse
 
 | Command | Covers |
 |---|---|
-| `npm test` (387 tests) | forms and validation (per-form tables, honeypot, timing), unified endpoint, CORS, rate limits, security / HTTPS / production config, Cloudflare Access token verification (forged, tampered, algorithm-confusion), admin authentication and per-website SQL scoping, architecture and migration rules, static checks that SQL matches form definitions |
-| `npm run test:db` (509 tests) | the above **plus**, on a real PostgreSQL test database: the whole Admin API (scoping, filters, search, pagination, updates, deletes, stats, users, audit, concurrency), table structure and constraints, atomic rate limits, TLS, and the migration rehearsal with realistic old data |
+| `npm test` (402 tests) | forms and validation (per-form tables, honeypot, timing), unified endpoint, CORS, rate limits, security / HTTPS / production config, Cloudflare Access token verification (forged, tampered, algorithm-confusion), admin authentication and per-website SQL scoping, architecture and migration rules, static checks that SQL matches form definitions |
+| `npm run test:db` (524 tests) | the above **plus**, on a real PostgreSQL test database: the whole Admin API (scoping, filters, search, pagination, updates, deletes, stats, users, audit, concurrency), table structure and constraints, atomic rate limits, TLS, and the migration rehearsal with realistic old data |
 
 `TEST_DATABASE_URL` must point at a dedicated database named `central_backend_test`; the real-database suites clear its tables and refuse to run elsewhere. The frontend's own tests (including a real frontend ⇄ backend suite) live in `../frontend`.
 
