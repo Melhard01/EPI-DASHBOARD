@@ -1,0 +1,77 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Light / dark design tokens. Components use the semantic names (bg-surface,
+   text-fg, border-line...) so a theme switch is a single class on <html>. */
+:root {
+  --surface: #ffffff;
+  --surface-2: #f6f7fb;
+  --surface-3: #eceef5;
+  --fg: #0f172a;
+  --muted: #5b6577;
+  --line: #e2e5ee;
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-fg: #ffffff;
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
+  color-scheme: light;
+}
+
+.dark {
+  --surface: #121826;
+  --surface-2: #0b101b;
+  --surface-3: #1b2334;
+  --fg: #e6e9f2;
+  --muted: #9aa5ba;
+  --line: #27314a;
+  --accent: #7c83ff;
+  --accent-hover: #9aa0ff;
+  --accent-fg: #0b101b;
+  --danger: #f87171;
+  --danger-hover: #fca5a5;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-fg: var(--accent-fg);
+  --color-danger: var(--danger);
+  --color-danger-hover: var(--danger-hover);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--surface-2);
+  color: var(--fg);
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
