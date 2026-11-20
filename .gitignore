@@ -1,0 +1,17 @@
+# Dependencies and build output (each app also has its own .gitignore)
+node_modules/
+dist/
+coverage/
+
+# Secrets: never commit
+.env
+.env.*
+!.env.example
+.dev-access/
+
+# Logs / OS / editors
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
