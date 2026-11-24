@@ -12,15 +12,11 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const apiTarget = env.DEV_API_TARGET || 'http://localhost:3000';
 
-  // Development only: Cloudflare Access adds this header at the edge in
-  // production. Locally the proxy plays that role, using a token from
-  // `npm run dev:token` in the backend. The token never reaches the browser.
-  const devAccessToken = env.DEV_ACCESS_TOKEN;
+  // JWT authentication is handled by the frontend after login (no dev proxy headers needed).
   const proxy = {
     '/api': {
       target: apiTarget,
       changeOrigin: false,
-      headers: devAccessToken ? { 'cf-access-jwt-assertion': devAccessToken } : {},
     },
   };
 

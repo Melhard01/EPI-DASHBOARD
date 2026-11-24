@@ -1,16 +1,25 @@
-import { useParams } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
+import { useEffect } from 'react';
 import { useSession } from './SessionContext.js';
 import { FullPageSpinner, ErrorState } from '../components/ui/States.jsx';
-import { SessionExpired, NotAnAdmin, Forbidden, NotFound } from '../pages/StatusPages.jsx';
+import { NotAnAdmin, Forbidden, NotFound } from '../pages/StatusPages.jsx';
 
 /** Renders its children only for a signed-in, active administrator. */
 export function RequireSession({ children }) {
   const session = useSession();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (session.state === 'unauthenticated') {
+      navigate('/login', { replace: true });
+    }
+  }, [session.state, navigate]);
+
   switch (session.state) {
     case 'loading':
       return <FullPageSpinner />;
     case 'unauthenticated':
-      return <SessionExpired onRetry={() => window.location.reload()} />;
+      return null; // Will redirect via useEffect
     case 'forbidden':
       return <NotAnAdmin />;
     case 'error':

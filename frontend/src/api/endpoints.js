@@ -8,6 +8,10 @@ const seg = encodeURIComponent;
 const itemPath = (application, formType, id) => `/submissions/${seg(application)}/${seg(formType)}/${seg(id)}`;
 
 export const api = {
+  /** Email/password login: returns { token, expiresIn, admin } */
+  login: (email, password) =>
+    request('/login', { method: 'POST', body: { email, password } }),
+
   /** The signed-in admin, their applications and forms. */
   me: (signal) => request('/me', { signal }),
 

@@ -7,6 +7,7 @@ import { AllSubmissions, FormSubmissions } from './pages/Submissions.jsx';
 import TeamManagement from './pages/TeamManagement.jsx';
 import AuditLogs from './pages/AuditLogs.jsx';
 import Settings from './pages/Settings.jsx';
+import Login from './pages/Login.jsx';
 import { NotFound } from './pages/StatusPages.jsx';
 
 /**
@@ -17,6 +18,7 @@ export default function App() {
   return (
     <SessionProvider>
       <Routes>
+        <Route path="/login" element={<Login />} />
         <Route
           element={
             <RequireSession>

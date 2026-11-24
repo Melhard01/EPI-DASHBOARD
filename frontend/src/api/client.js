@@ -1,13 +1,12 @@
 /**
  * The ONE place the dashboard talks to the backend (REST over fetch).
  *
- * - No credentials, tokens or database access exist in the browser code. In
- *   production Cloudflare Access authenticates the browser and adds the signed
- *   header at the edge; locally the Vite dev proxy does.
+ * - Sends JWT tokens in Authorization header for authenticated requests.
  * - The backend owns all validation and permissions. This client only moves
  *   JSON, and turns failures into ApiError objects the UI can render.
  */
 import { config } from '../config.js';
+import { getToken } from '../lib/jwt.js';
 
 export class ApiError extends Error {
   /**
@@ -81,6 +80,14 @@ export async function request(path, { method = 'GET', query, body, signal } = {}
   const headers = { accept: 'application/json', ...settings.headers };
   if (body !== undefined) headers['content-type'] = 'application/json';
 
+  // Attach JWT token for protected requests (not /login)
+  if (path !== '/login') {
+    const token = getToken();
+    if (token) {
+      headers['authorization'] = `Bearer ${token}`;
+    }
+  }
+
   let response;
   try {
     response = await fetch(buildUrl(path, query), {
@@ -89,19 +96,10 @@ export async function request(path, { method = 'GET', query, body, signal } = {}
       body: body === undefined ? undefined : JSON.stringify(body),
       signal,
       credentials: settings.baseUrl ? 'include' : 'same-origin',
-      // An expired Cloudflare Access session answers with a redirect to the login
-      // page. Following it would fail as a confusing cross-origin error, so it is
-      // detected and reported as "session expired" instead.
-      redirect: 'manual',
     });
   } catch (err) {
     if (err?.name === 'AbortError') throw err;
     throw new ApiError({ kind: 'network', message: 'Cannot reach the server. Check your connection and try again.' });
-  }
-
-  if (response.type === 'opaqueredirect') {
-    settings.onUnauthorized?.();
-    throw new ApiError({ status: 401, kind: 'session', message: 'Your session has expired. Please sign in again.' });
   }
 
   const text = await response.text();

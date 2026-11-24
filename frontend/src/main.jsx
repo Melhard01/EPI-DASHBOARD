@@ -6,12 +6,12 @@ import './index.css';
 import App from './App.jsx';
 import { configureClient } from './api/client.js';
 import { createQueryClient } from './queryClient.js';
-import { reloadToSignIn } from './lib/session.js';
 import { applyTheme, getTheme } from './lib/theme.js';
+import { clearToken } from './lib/jwt.js';
 
 applyTheme(getTheme());
-// A 401 means the Cloudflare Access session is gone: reload so Access shows its login.
-configureClient({ onUnauthorized: reloadToSignIn });
+// A 401 means the JWT token is invalid or expired: clear it and show the login screen.
+configureClient({ onUnauthorized: clearToken });
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

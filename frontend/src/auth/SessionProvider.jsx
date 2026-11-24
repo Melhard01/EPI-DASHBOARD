@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/endpoints.js';
 import { ApiError } from '../api/client.js';
 import { SessionContext } from './SessionContext.js';
+import { hasValidToken } from '../lib/jwt.js';
 
 function stateOf(query) {
   if (query.isSuccess) return 'ready';
@@ -14,11 +15,16 @@ function stateOf(query) {
 }
 
 export default function SessionProvider({ children }) {
+  // Only attempt to fetch /me if we have a valid token
+  const shouldFetch = hasValidToken();
+
   const query = useQuery({
     queryKey: ['me'],
     queryFn: ({ signal }) => api.me(signal),
+    enabled: shouldFetch,
     retry: false,
-    staleTime: 5 * 60_000,
+    staleTime: 10 * 60_000, // Keep data fresh for 10 minutes
+    gcTime: 30 * 60_000,    // Keep in cache for 30 minutes (even when not in use)
   });
 
   const { status, data, error, refetch } = query;
@@ -26,9 +32,13 @@ export default function SessionProvider({ children }) {
     const admin = data ?? null;
     const applications = admin?.applications ?? [];
     return {
-      state: stateOf({ isSuccess: status === 'success', isError: status === 'error', error }),
+      state: stateOf({
+        isSuccess: status === 'success',
+        isError: status === 'error',
+        error: shouldFetch ? error : new ApiError({ status: 401, message: 'Not authenticated' })
+      }),
       admin,
-      error,
+      error: shouldFetch ? error : new ApiError({ status: 401, message: 'Not authenticated' }),
       refetch,
       applications,
       statuses: admin?.statuses ?? [],
@@ -36,7 +46,7 @@ export default function SessionProvider({ children }) {
       canAccess: (slug) => applications.some((a) => a.slug === slug),
       application: (slug) => applications.find((a) => a.slug === slug) ?? null,
     };
-  }, [status, data, error, refetch]);
+  }, [status, data, error, refetch, shouldFetch]);
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 }
