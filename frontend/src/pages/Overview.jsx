@@ -95,6 +95,8 @@ export default function Overview() {
     queryKey: ['stats', { days }],
     queryFn: ({ signal }) => api.stats({ days }, signal),
     placeholderData: keepPreviousData,
+    staleTime: 2 * 60_000, // Keep fresh for 2 minutes
+    gcTime: 10 * 60_000,   // Keep in cache for 10 minutes
     retry: false,
   });
   const applicationName = (slug) => applications.find((a) => a.slug === slug)?.name ?? slug;
