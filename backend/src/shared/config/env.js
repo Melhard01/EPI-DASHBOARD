@@ -13,7 +13,6 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { CLIENT_IP_SOURCES, ClientIpSource } from '../security/clientIp.js';
 import { normalizeOrigin } from '../security/cors.js';
-import { normalizeTeamDomain } from '../security/cloudflareAccess.js';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const envFile = path.join(projectRoot, '.env');
@@ -25,7 +24,7 @@ if (existsSync(envFile)) {
 
 const VALID_ENVIRONMENTS = ['development', 'production', 'test'];
 const RATE_LIMIT_STORES = ['postgres', 'memory'];
-const AUTH_MODES = ['cloudflare-access', 'dev', 'none'];
+const AUTH_MODES = ['jwt', 'dev', 'none'];
 const LOCAL_DB_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '[::1]']);
 const MIN_SECRET_LENGTH = 32;
 
@@ -144,22 +143,28 @@ export function loadEnv(source) {
   }
 
   // --- Admin authentication -------------------------------------------
-  // cloudflare-access: verify Cloudflare Access JWTs (required in production)
-  // dev:               verify locally signed JWTs (npm run dev:token), never production
-  // none:              admin API answers 503 (no admin access configured)
-  const authMode = source.AUTH_MODE || (source.ACCESS_TEAM_DOMAIN ? 'cloudflare-access' : 'none');
+  // jwt:   email/password authentication with JWT tokens (recommended)
+  // dev:   locally signed JWTs (npm run dev:token), never production
+  // none:  admin API answers 503 (no admin access configured)
+  const authMode = source.AUTH_MODE || 'none';
   if (!AUTH_MODES.includes(authMode)) {
     throw new Error(`Invalid AUTH_MODE "${authMode}". Expected one of: ${AUTH_MODES.join(', ')}`);
   }
-  if (isProduction && authMode !== 'cloudflare-access') {
-    throw new Error('Production requires AUTH_MODE=cloudflare-access');
+  if (isProduction && authMode === 'none') {
+    throw new Error('Production requires AUTH_MODE=jwt or AUTH_MODE=dev');
   }
-  let access = null;
-  if (authMode === 'cloudflare-access') {
-    if (!source.ACCESS_TEAM_DOMAIN || !source.ACCESS_AUD) {
-      throw new Error('AUTH_MODE=cloudflare-access requires ACCESS_TEAM_DOMAIN and ACCESS_AUD');
+
+  let jwtSecret = null;
+  let jwtExpiryHours = 24;
+  if (authMode === 'jwt') {
+    jwtSecret = source.JWT_SECRET || null;
+    if (!jwtSecret || jwtSecret.length < MIN_SECRET_LENGTH) {
+      throw new Error(`AUTH_MODE=jwt requires JWT_SECRET (at least ${MIN_SECRET_LENGTH} characters)`);
     }
-    access = { teamDomain: normalizeTeamDomain(source.ACCESS_TEAM_DOMAIN), audience: source.ACCESS_AUD };
+    jwtExpiryHours = Number(source.JWT_EXPIRY_HOURS) || 24;
+    if (!Number.isInteger(jwtExpiryHours) || jwtExpiryHours < 1 || jwtExpiryHours > 365) {
+      throw new Error('JWT_EXPIRY_HOURS must be between 1 and 365');
+    }
   }
 
   // --- CORS ---------------------------------------------------------------
@@ -182,7 +187,8 @@ export function loadEnv(source) {
     nodeEnv,
     isProduction,
     authMode,
-    access,
+    jwtSecret,
+    jwtExpiryHours,
     devAccessJwksPath: source.DEV_ACCESS_JWKS_PATH || '.dev-access/jwks.json',
     corsOrigins: Object.freeze(corsOrigins),
     adminOrigins: Object.freeze(adminOrigins),

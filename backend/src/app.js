@@ -29,10 +29,8 @@ import { logger } from './shared/utils/logger.js';
 import { ClientIpSource } from './shared/security/clientIp.js';
 import { PostgresRateLimitStore, MemoryRateLimitStore } from './shared/security/rateLimitStores.js';
 import { cors, createCorsPolicy } from './shared/security/cors.js';
-import { createAccessVerifier } from './shared/security/cloudflareAccess.js';
 import { createSubmissionsRouter } from './platform/submissions.routes.js';
 import { createAdminRouter } from './platform/admin/router.js';
-import { readFileSync } from 'node:fs';
 
 const API_PREFIX = '/api';
 const API_VERSION = 'v1';
@@ -40,19 +38,12 @@ const API_BASE = `${API_PREFIX}/${API_VERSION}`;
 // Platform paths under /api/v1 that no application slug may use.
 const RESERVED_SLUGS = new Set(['admin', 'submissions']);
 
-/** Issuer/audience used only by AUTH_MODE=dev tokens (npm run dev:token). */
-export const DEV_ACCESS = Object.freeze({
-  teamDomain: 'https://dev-access.invalid',
-  audience: 'central-backend-local-development',
-});
-
-function createDefaultAccessVerifier() {
-  if (env.authMode === 'cloudflare-access') return createAccessVerifier(env.access);
-  if (env.authMode === 'dev') {
-    return createAccessVerifier({
-      ...DEV_ACCESS,
-      fetchJwks: async () => JSON.parse(readFileSync(env.devAccessJwksPath, 'utf8')),
-    });
+function getJWTSecret() {
+  if (env.authMode === 'jwt') {
+    if (!env.jwtSecret) {
+      throw new Error('AUTH_MODE=jwt requires JWT_SECRET (32+ chars)');
+    }
+    return env.jwtSecret;
   }
   return null;
 }
@@ -93,8 +84,10 @@ export function createApp(options = {}) {
       options.rateLimitStore !== undefined ? options.rateLimitStore : createDefaultRateLimitStore(),
     rateLimitSecret:
       options.rateLimitSecret ?? env.rateLimitSecret ?? randomBytes(32).toString('hex'),
-    accessVerifier:
-      options.accessVerifier !== undefined ? options.accessVerifier : createDefaultAccessVerifier(),
+    jwtSecret:
+      options.jwtSecret !== undefined ? options.jwtSecret : getJWTSecret(),
+    jwtExpiryHours:
+      options.jwtExpiryHours ?? env.jwtExpiryHours ?? 24,
     corsPolicy: options.corsPolicy ?? createDefaultCorsPolicy(),
   };
 
@@ -102,13 +95,10 @@ export function createApp(options = {}) {
     if (!settings.enforceHttps) throw new Error('HTTPS enforcement cannot be disabled in production');
     if (!settings.rateLimitStore) throw new Error('Rate limiting cannot be disabled in production');
     if (settings.clientIpSource === ClientIpSource.SOCKET) {
-      throw new Error('Production must use a Cloudflare client IP source');
+      throw new Error('Production must use a trusted proxy configuration (not bare socket)');
     }
     if (settings.clientIpSource === ClientIpSource.VERCEL_CLOUDFLARE && !settings.originAuthSecret) {
       throw new Error('Production on Vercel requires ORIGIN_AUTH_SECRET');
-    }
-    if (!settings.accessVerifier) {
-      throw new Error('Production requires Cloudflare Access verification for the admin API');
     }
   }
 
@@ -123,7 +113,6 @@ export function createApp(options = {}) {
 
   app.locals.rateLimitStore = settings.rateLimitStore;
   app.locals.rateLimitSecret = settings.rateLimitSecret;
-  app.locals.accessVerifier = settings.accessVerifier;
   app.locals.corsPolicy = settings.corsPolicy;
 
   // Platform-wide middleware
@@ -165,7 +154,14 @@ export function createApp(options = {}) {
 
   // Platform endpoints that span applications
   app.use(`${API_BASE}/submissions`, createSubmissionsRouter(registry));
-  app.use(`${API_BASE}/admin`, createAdminRouter({ applications: registry }));
+  app.use(
+    `${API_BASE}/admin`,
+    createAdminRouter({
+      applications: registry,
+      jwtSecret: settings.jwtSecret,
+      jwtExpiryHours: settings.jwtExpiryHours,
+    })
+  );
 
   // Mount each application on its own isolated namespace
   const seen = new Set();
