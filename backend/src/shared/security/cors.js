@@ -24,9 +24,8 @@ const PREFLIGHT_MAX_AGE_SECONDS = '600';
 const PUBLIC_METHODS = ['POST'];
 const PUBLIC_HEADERS = ['content-type'];
 const ADMIN_METHODS = ['GET', 'POST', 'PATCH', 'DELETE'];
-// cf-access-jwt-assertion: in production Cloudflare adds it at the edge; a
-// local dashboard in development sends it itself.
-const ADMIN_HEADERS = ['content-type', 'cf-access-jwt-assertion'];
+// authorization: JWT token sent by the dashboard in Authorization: Bearer header
+const ADMIN_HEADERS = ['content-type', 'authorization'];
 const UNSAFE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
 /**
