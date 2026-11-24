@@ -1,9 +1,12 @@
 /**
  * Central Admin API: /api/v1/admin/*
  *
- * Every route requires:
+ * Public endpoints (no authentication required):
+ *   POST   /login                 { email, password }     - Get JWT token
+ *
+ * Protected endpoints (require JWT token in Authorization header):
  *   1. an allowed dashboard Origin (any Origin must be allowed; changes must send one)
- *   2. a verified Cloudflare Access identity that is an ACTIVE admin
+ *   2. a verified JWT token that belongs to an ACTIVE admin
  * and is then authorized per application (see permissions.js).
  *
  *   GET    /me
@@ -36,6 +39,7 @@ import {
 } from './submissions.repository.js';
 import { listUsers, createUser, updateUser } from './users.repository.js';
 import { listAudit } from './audit.repository.js';
+import { loginAdmin } from './login.repository.js';
 
 const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -44,14 +48,30 @@ const paginated = (items, total, page, pageSize) => ({
   pagination: { page, pageSize, total, totalPages: Math.max(1, Math.ceil(total / pageSize)) },
 });
 
-export function createAdminRouter({ applications }) {
+export function createAdminRouter({ applications, jwtSecret, jwtExpiryHours }) {
   const bySlug = new Map(applications.map((a) => [a.slug, a]));
   const slugs = applications.map((a) => a.slug);
   const allFormTypes = [...new Set(applications.flatMap((a) => a.formTypes))];
   const router = Router();
 
   router.use(requireAdminOrigin);
-  router.use(authenticateAdmin({ applicationSlugs: slugs }));
+
+  // ================================================================ login (public)
+  router
+    .route('/login')
+    .post(async (req, res) => {
+      const body = requireBodyKeys(req.body, ['email', 'password']);
+      const result = await loginAdmin(body.email, body.password, jwtSecret, jwtExpiryHours);
+      return sendSuccess(res, {
+        statusCode: 200,
+        message: 'Login successful',
+        data: { data: result },
+      });
+    })
+    .all(methodNotAllowed(['POST']));
+
+  // Apply authentication middleware to all routes below this point
+  router.use(authenticateAdmin({ applicationSlugs: slugs, jwtSecret }));
 
   /** Resolves :application from the path: 404 if unknown, 403 if not permitted. */
   function appFromPath(req) {
