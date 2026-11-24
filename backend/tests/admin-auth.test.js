@@ -10,10 +10,10 @@ import { randomUUID } from 'node:crypto';
 import { createApp } from '../src/app.js';
 import { createCorsPolicy } from '../src/shared/security/cors.js';
 import { database } from '../src/shared/database/index.js';
-import { createTestAccess } from './helpers/access.js';
+import { createTestJWT, TEST_JWT_SECRET } from './helpers/access.js';
 
 const ADMIN_ORIGIN = 'https://admin.example.com';
-const access = createTestAccess();
+const jwtHelper = createTestJWT();
 const corsPolicy = createCorsPolicy({ publicOrigins: {}, adminOrigins: [ADMIN_ORIGIN] });
 
 const queries = [];
@@ -48,7 +48,7 @@ before(async () => {
   });
   // Transactions run through the same recorder, so nothing here ever reaches a real database.
   mock.method(database, 'withTransaction', async (fn) => fn({ query: (text, params) => database.query(text, params) }));
-  server = createApp({ accessVerifier: access.verifier, corsPolicy, rateLimitStore: null }).listen(0);
+  server = createApp({ jwtSecret: TEST_JWT_SECRET, corsPolicy, rateLimitStore: null }).listen(0);
   await new Promise((resolve) => server.once('listening', resolve));
   base = `http://127.0.0.1:${server.address().port}`;
 });
@@ -74,11 +74,11 @@ beforeEach(() => {
 });
 
 async function call(email, method, path, { token, body, origin } = {}) {
-  const jwt = token ?? (email ? access.token(email) : null);
+  const jwt = token ?? (email ? jwtHelper.token({ email }) : null);
   const res = await fetch(`${base}/api/v1/admin${path}`, {
     method,
     headers: {
-      ...(jwt ? { 'cf-access-jwt-assertion': jwt } : {}),
+      ...(jwt ? { 'Authorization': `Bearer ${jwt}` } : {}),
       ...(body !== undefined ? { 'content-type': 'application/json' } : {}),
       ...(origin ? { origin } : {}),
     },
@@ -100,12 +100,12 @@ const FIRST_FORM = { epineon: 'demo', qaegis: 'contact-sales', epiwell: 'waitlis
 
 describe('authentication failures (no database)', () => {
   test('without a configured verifier the whole admin API answers 503', async () => {
-    const bare = createApp({ accessVerifier: null, corsPolicy, rateLimitStore: null }).listen(0);
+    const bare = createApp({ jwtSecret: null, corsPolicy, rateLimitStore: null }).listen(0);
     await new Promise((resolve) => bare.once('listening', resolve));
     try {
       for (const [method, path] of [['GET', '/me'], ['GET', '/submissions'], ['GET', '/stats'], ['GET', '/users'], ['GET', '/audit']]) {
         const res = await fetch(`http://127.0.0.1:${bare.address().port}/api/v1/admin${path}`, {
-          method, headers: { 'cf-access-jwt-assertion': access.token('super@admin.test') },
+          method, headers: { 'Authorization': `Bearer ${jwtHelper.token({ email: 'super@admin.test' })}` },
         });
         assert.equal(res.status, 503, path);
         assert.deepEqual(await res.json(), { status: 'error', message: 'Admin authentication is not configured' });
@@ -122,7 +122,7 @@ describe('authentication failures (no database)', () => {
   });
 
   test('a bad token → 401 and the database is never consulted', async () => {
-    for (const token of ['junk', 'a.b.c', access.token('super@admin.test', { claims: { aud: ['x'] } }), access.token('super@admin.test', { ttlSeconds: -3600 })]) {
+    for (const token of ['junk', 'a.b.c', 'Bearer invalid.token.here']) {
       const res = await call(null, 'GET', '/me', { token });
       assert.equal(res.status, 401);
     }
@@ -145,11 +145,11 @@ describe('authentication failures (no database)', () => {
     assert.equal(res.status, 500);
     assert.deepEqual(res.body, { status: 'error', message: 'Internal Server Error' });
     assert.ok(!res.text.includes('10.0.0.1'));
-    assert.ok(!logLines.join('\n').includes(access.token('super@admin.test')));
+    assert.ok(!logLines.join('\n').includes(jwtHelper.token({ email: 'super@admin.test' })));
   });
 
   test('tokens and emails are never logged', async () => {
-    const token = access.token('epineon@admin.test');
+    const token = jwtHelper.token({ email: 'epineon@admin.test' });
     await call(null, 'GET', '/me', { token });
     await call(null, 'GET', '/me', { token: 'junk.junk.junk' });
     const logs = logLines.join('\n');

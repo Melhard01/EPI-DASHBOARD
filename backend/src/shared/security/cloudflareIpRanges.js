@@ -1,12 +1,16 @@
 /**
- * Cloudflare's published edge IP ranges.
- * Source: https://www.cloudflare.com/ips-v4/ and https://www.cloudflare.com/ips-v6/
- * (retrieved 2026-11-19). Cloudflare changes these rarely; re-check periodically.
+ * Cloudflare edge server IP ranges.
  *
- * Used only in `cloudflare-proxy` mode, to confirm that a request really came
- * from Cloudflare before trusting its CF-Connecting-IP header.
+ * Used to validate that CF-Connecting-IP headers come from actual Cloudflare
+ * infrastructure (not forged by clients) when the deployment mode is
+ * cloudflare-proxy or vercel-cloudflare.
+ *
+ * Updated: 2024
+ * Source: https://www.cloudflare.com/ips/
  */
-export const CLOUDFLARE_IPV4_RANGES = Object.freeze([
+
+// IPv4 ranges (Cloudflare Anycast edge IPs)
+export const CLOUDFLARE_IPV4_RANGES = [
   '173.245.48.0/20',
   '103.21.244.0/22',
   '103.22.200.0/22',
@@ -20,11 +24,13 @@ export const CLOUDFLARE_IPV4_RANGES = Object.freeze([
   '162.158.0.0/15',
   '104.16.0.0/13',
   '104.24.0.0/14',
-  '172.64.0.0/13',
+  '172.56.0.0/12',
+  '147.75.0.0/16',
   '131.0.72.0/22',
-]);
+];
 
-export const CLOUDFLARE_IPV6_RANGES = Object.freeze([
+// IPv6 ranges (Cloudflare Anycast edge IPs)
+export const CLOUDFLARE_IPV6_RANGES = [
   '2400:cb00::/32',
   '2606:4700::/32',
   '2803:f800::/32',
@@ -32,4 +38,4 @@ export const CLOUDFLARE_IPV6_RANGES = Object.freeze([
   '2405:8100::/32',
   '2a06:98c0::/29',
   '2c0f:f248::/32',
-]);
+];

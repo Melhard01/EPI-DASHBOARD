@@ -1,23 +1,22 @@
 /**
- * Test helper: a fake Cloudflare Access team (RSA key + JWKS) and token signer.
- * Tokens are verified by the real createAccessVerifier(); only the key
- * source (an in-memory JWKS instead of Cloudflare's certs URL) is replaced.
+ * Test helper: JWT token generation for testing.
+ * Uses the real generateJWT and verifyJWT from the JWT token module.
  */
-import { createAccessKeyPair, signAccessToken } from '../../scripts/lib/access-token.js';
-import { createAccessVerifier } from '../../src/shared/security/cloudflareAccess.js';
+import { generateJWT, verifyJWT } from '../../src/shared/security/jwtToken.js';
 
-export const TEST_TEAM = 'https://test-team.cloudflareaccess.com';
-export const TEST_AUD = 'test-audience-tag-0123456789abcdef0123456789abcdef';
+export const TEST_JWT_SECRET = 'test-secret-must-be-32-characters1';
 
-export function createTestAccess({ now } = {}) {
-  const key = createAccessKeyPair('test-key-1');
-  const verifier = createAccessVerifier({
-    teamDomain: TEST_TEAM,
-    audience: TEST_AUD,
-    fetchJwks: async () => key.jwks,
-    ...(now ? { now } : {}),
-  });
+export function createTestJWT() {
+  const verifier = (token) => {
+    try {
+      return verifyJWT(token, TEST_JWT_SECRET);
+    } catch (err) {
+      throw new Error(err.message);
+    }
+  };
+
   const token = (email, overrides = {}) =>
-    signAccessToken({ email, teamDomain: TEST_TEAM, audience: TEST_AUD, key, ...overrides });
-  return { key, verifier, token };
+    generateJWT({ email, ...overrides }, TEST_JWT_SECRET, 24);
+
+  return { verifier, token };
 }
