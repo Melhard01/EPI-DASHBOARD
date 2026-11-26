@@ -112,8 +112,9 @@ export function cors({ apiBase }) {
     const isPreflight = req.method === 'OPTIONS' && req.headers['access-control-request-method'];
     if (!isPreflight) return next();
 
-    // Allow admin routes from any origin for now (admin auth is still required)
-    if (routeClass.kind !== 'admin' && !allowed) return next(new AppError('Origin not allowed', 403));
+    // Allow preflight for all origins on public endpoints (enforcement is disabled for testing)
+    // Admin routes still require enforcement
+    if (routeClass.kind === 'admin' && !allowed) return next(new AppError('Origin not allowed', 403));
 
     const methods = routeClass.kind === 'admin' ? ADMIN_METHODS : PUBLIC_METHODS;
     const headers = routeClass.kind === 'admin' ? ADMIN_HEADERS : PUBLIC_HEADERS;
