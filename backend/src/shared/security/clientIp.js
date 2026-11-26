@@ -119,6 +119,10 @@ export function resolveClientIp(req, source, options = {}) {
  */
 export function isSecureRequest(req, source, options = {}) {
   if (req.socket?.encrypted === true) return true;
-  if (source === ClientIpSource.SOCKET || !isFromTrustedProxy(req, source, options)) return false;
+  // Allow SOCKET source on Vercel: check x-forwarded-proto header for HTTPS
+  if (source === ClientIpSource.SOCKET) {
+    return singleHeader(req, 'x-forwarded-proto')?.toLowerCase() === 'https';
+  }
+  if (!isFromTrustedProxy(req, source, options)) return false;
   return singleHeader(req, 'x-forwarded-proto')?.toLowerCase() === 'https';
 }
