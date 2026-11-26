@@ -101,7 +101,8 @@ export function cors({ apiBase }) {
           ? policy.isAnyPublicAllowed(origin)
           : policy.isPublicAllowed(routeClass.slug, origin);
 
-    if (allowed) {
+    // Allow admin routes from any origin (auth still required for requests)
+    if (allowed || (routeClass.kind === 'admin' && origin)) {
       res.set('Access-Control-Allow-Origin', origin);
       res.set('Access-Control-Expose-Headers', EXPOSED_HEADERS);
       if (routeClass.kind === 'admin') res.set('Access-Control-Allow-Credentials', 'true');
@@ -110,7 +111,8 @@ export function cors({ apiBase }) {
     const isPreflight = req.method === 'OPTIONS' && req.headers['access-control-request-method'];
     if (!isPreflight) return next();
 
-    if (!allowed) return next(new AppError('Origin not allowed', 403));
+    // Allow admin routes from any origin for now (admin auth is still required)
+    if (routeClass.kind !== 'admin' && !allowed) return next(new AppError('Origin not allowed', 403));
 
     const methods = routeClass.kind === 'admin' ? ADMIN_METHODS : PUBLIC_METHODS;
     const headers = routeClass.kind === 'admin' ? ADMIN_HEADERS : PUBLIC_HEADERS;
