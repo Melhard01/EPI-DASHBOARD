@@ -6,10 +6,13 @@
    Components use semantic names (bg-surface, text-fg) for easy theme switching. */
 :root {
   /* Backgrounds: warm cream/ivory palette */
-  --surface: #fdfbf7;
-  --surface-2: #faf8f4;
-  --surface-3: #f5f1eb;
-  --surface-4: #ede7dd;
+  --surface: #ffffff;
+  --surface-2: #fef9f0;
+  --surface-3: #fce8d1;
+  --surface-4: #f5e1c0;
+
+  /* Main background: warm cream */
+  --bg-main: #f5e6d3;
 
   /* Text: dark charcoal */
   --fg: #2d2520;
@@ -17,21 +20,21 @@
   --muted-light: #bbb3a8;
 
   /* Borders: subtle warm gray */
-  --line: #e8e0d6;
+  --line: #e8d4b8;
 
-  /* Accent: soft golden yellow */
-  --accent: #d4a574;
-  --accent-hover: #c49563;
+  /* Accent: vibrant golden yellow */
+  --accent: #f4d35e;
+  --accent-hover: #e8c547;
   --accent-fg: #2d2520;
-  --accent-light: #f5e6d3;
+  --accent-light: #fce8d1;
 
-  /* Status colors: soft palette */
-  --success: #86c06b;
-  --success-hover: #7ab35a;
-  --warning: #d9a34a;
-  --warning-hover: #ca9640;
-  --danger: #c85a54;
-  --danger-hover: #b74a47;
+  /* Status colors: vibrant palette */
+  --success: #2ecc71;
+  --success-hover: #27ae60;
+  --warning: #f39c12;
+  --warning-hover: #d68910;
+  --danger: #e74c3c;
+  --danger-hover: #c0392b;
 
   color-scheme: light;
 }
@@ -98,7 +101,7 @@ body,
 
 body {
   margin: 0;
-  background: var(--surface-2);
+  background: var(--bg-main);
   color: var(--fg);
   font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

@@ -79,7 +79,7 @@ export default function DashboardLayout() {
   }, [menuOpen]);
 
   return (
-    <div className="flex min-h-screen bg-surface-2">
+    <div className="flex min-h-screen" style={{ backgroundColor: 'var(--bg-main)' }}>
       {/* Desktop sidebar */}
       <aside className="hidden w-64 shrink-0 flex-col border-r border-line bg-surface lg:flex shadow-soft">
         <div className="flex h-16 items-center px-5">
