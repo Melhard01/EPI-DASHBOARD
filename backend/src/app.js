@@ -94,9 +94,7 @@ export function createApp(options = {}) {
   if (env.isProduction) {
     if (!settings.enforceHttps) throw new Error('HTTPS enforcement cannot be disabled in production');
     if (!settings.rateLimitStore) throw new Error('Rate limiting cannot be disabled in production');
-    if (settings.clientIpSource === ClientIpSource.SOCKET) {
-      throw new Error('Production must use a trusted proxy configuration (not bare socket)');
-    }
+    // Allow socket IP source for Vercel-only deployments without Cloudflare
     if (settings.clientIpSource === ClientIpSource.VERCEL_CLOUDFLARE && !settings.originAuthSecret) {
       throw new Error('Production on Vercel requires ORIGIN_AUTH_SECRET');
     }
