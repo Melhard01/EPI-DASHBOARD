@@ -23,7 +23,7 @@ export const demoForm = defineForm({
     role: roleField,
     product: productField,
     // "What would you like to see?" (optional on the live site)
-    message: { type: FieldType.TEXT, required: false, maxLength: 5000, multiline: true },
+    message: { type: FieldType.TEXT, required: false, maxLength: 5000, multiline: true, column: 'message' },
   },
   honeypot: EPINEON_HONEYPOT,
   timing: EPINEON_TIMING,

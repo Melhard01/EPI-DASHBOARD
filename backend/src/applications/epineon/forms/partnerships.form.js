@@ -12,8 +12,8 @@ export const partnershipsForm = defineForm({
   fields: {
     name: nameField,
     email: emailField,
-    organization: { type: FieldType.TEXT, required: true, maxLength: 160 },
-    nature: { type: FieldType.TEXT, required: true, maxLength: 5000, multiline: true },
+    organization: { type: FieldType.TEXT, required: true, maxLength: 160, column: 'organization' },
+    nature: { type: FieldType.TEXT, required: true, maxLength: 5000, multiline: true, column: 'nature' },
   },
   honeypot: EPINEON_HONEYPOT,
   timing: EPINEON_TIMING,

@@ -27,15 +27,16 @@ export const USE_CASE_OPTIONS = Object.freeze([
   'Other',
 ]);
 
-export const nameField = { type: FieldType.TEXT, required: true, maxLength: 120 };
-export const emailField = { type: FieldType.EMAIL, required: true, maxLength: 254, lowercase: true };
-export const companyField = { type: FieldType.TEXT, required: true, maxLength: 160 };
-export const roleField = { type: FieldType.TEXT, required: false, maxLength: 120 };
+export const nameField = { type: FieldType.TEXT, required: true, maxLength: 120, column: 'name' };
+export const emailField = { type: FieldType.EMAIL, required: true, maxLength: 254, lowercase: true, column: 'email' };
+export const companyField = { type: FieldType.TEXT, required: true, maxLength: 160, column: 'company' };
+export const roleField = { type: FieldType.TEXT, required: false, maxLength: 120, column: 'role' };
 export const productField = {
   type: FieldType.CHOICE,
   required: true,
   maxLength: 40,
   options: PRODUCT_OPTIONS,
+  column: 'product',
 };
 
 /** Anti-spam settings used by every Epineon form (same as the live site). */
