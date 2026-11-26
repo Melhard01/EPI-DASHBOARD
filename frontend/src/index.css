@@ -7,63 +7,63 @@
 /* Premium SaaS design tokens: warm cream, soft gold, dark charcoal.
    Components use semantic names (bg-surface, text-fg) for easy theme switching. */
 :root {
-  /* Backgrounds: warm cream/ivory palette */
+  /* Backgrounds: light palette */
   --surface: #ffffff;
-  --surface-2: #fef9f0;
-  --surface-3: #fce8d1;
-  --surface-4: #f5e1c0;
+  --surface-2: #f6f7fb;
+  --surface-3: #eceef5;
+  --surface-4: #e2e5ee;
 
-  /* Main background: warm cream */
-  --bg-main: #f5e6d3;
+  /* Main background */
+  --bg-main: #f6f7fb;
 
-  /* Text: dark charcoal */
-  --fg: #2d2520;
-  --muted: #8b7d73;
-  --muted-light: #bbb3a8;
+  /* Text: dark slate */
+  --fg: #0f172a;
+  --muted: #5b6577;
+  --muted-light: #8a92a6;
 
-  /* Borders: subtle warm gray */
-  --line: #e8d4b8;
+  /* Borders: subtle gray */
+  --line: #e2e5ee;
 
-  /* Accent: vibrant golden yellow */
-  --accent: #f4d35e;
-  --accent-hover: #e8c547;
-  --accent-fg: #2d2520;
-  --accent-light: #fce8d1;
+  /* Accent: indigo/purple */
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-fg: #ffffff;
+  --accent-light: #eef2ff;
 
-  /* Status colors: vibrant palette */
-  --success: #2ecc71;
-  --success-hover: #27ae60;
-  --warning: #f39c12;
-  --warning-hover: #d68910;
-  --danger: #e74c3c;
-  --danger-hover: #c0392b;
+  /* Status colors */
+  --success: #10b981;
+  --success-hover: #059669;
+  --warning: #f59e0b;
+  --warning-hover: #d97706;
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
 
   color-scheme: light;
 }
 
 .dark {
-  --surface: #1f1b18;
-  --surface-2: #2a2420;
-  --surface-3: #342e28;
-  --surface-4: #3f3730;
+  --surface: #121826;
+  --surface-2: #0b101b;
+  --surface-3: #1b2334;
+  --surface-4: #27314a;
 
-  --fg: #f5ede6;
-  --muted: #a89d93;
-  --muted-light: #7a6e64;
+  --fg: #e6e9f2;
+  --muted: #9aa5ba;
+  --muted-light: #bfc4d4;
 
-  --line: #3f3730;
+  --line: #27314a;
 
-  --accent: #d4a574;
-  --accent-hover: #e8b896;
-  --accent-fg: #1f1b18;
-  --accent-light: #3f3326;
+  --accent: #7c83ff;
+  --accent-hover: #9aa0ff;
+  --accent-fg: #0b101b;
+  --accent-light: #2d3350;
 
-  --success: #a8d573;
-  --success-hover: #bfe691;
-  --warning: #e8b965;
-  --warning-hover: #f0cc8a;
-  --danger: #d87d75;
-  --danger-hover: #e69c94;
+  --success: #34d399;
+  --success-hover: #10b981;
+  --warning: #fbbf24;
+  --warning-hover: #f59e0b;
+  --danger: #f87171;
+  --danger-hover: #fca5a5;
 
   color-scheme: dark;
 }
@@ -103,8 +103,7 @@ body,
 
 body {
   margin: 0;
-  background: linear-gradient(135deg, var(--bg-main) 0%, #fdf4e8 100%);
-  background-attachment: fixed;
+  background: var(--bg-main);
   color: var(--fg);
   font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
   font-weight: 400;
