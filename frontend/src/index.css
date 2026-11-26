@@ -16,11 +16,10 @@
   /* Main background: warm cream */
   --bg-main: #f5e6d3;
 
-  /* Text: charcoal hierarchy */
-  --fg: #171717;
-  --fg-secondary: #252525;
-  --muted: #777777;
-  --muted-light: #858585;
+  /* Text: dark charcoal */
+  --fg: #2d2520;
+  --muted: #8b7d73;
+  --muted-light: #bbb3a8;
 
   /* Borders: subtle warm gray */
   --line: #e8d4b8;
@@ -48,8 +47,7 @@
   --surface-3: #342e28;
   --surface-4: #3f3730;
 
-  --fg: #f5f3ed;
-  --fg-secondary: #e8e6df;
+  --fg: #f5ede6;
   --muted: #a89d93;
   --muted-light: #7a6e64;
 
@@ -76,7 +74,6 @@
   --color-surface-3: var(--surface-3);
   --color-surface-4: var(--surface-4);
   --color-fg: var(--fg);
-  --color-fg-secondary: var(--fg-secondary);
   --color-muted: var(--muted);
   --color-muted-light: var(--muted-light);
   --color-line: var(--line);
