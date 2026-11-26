@@ -6,8 +6,8 @@ import { formLabel } from '../lib/labels.js';
 import { NeutralBadge } from '../components/ui/Badge.jsx';
 
 const linkClass = ({ isActive }) =>
-  `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-    isActive ? 'bg-accent/10 text-accent' : 'text-fg hover:bg-surface-3'
+  `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-smooth ${
+    isActive ? 'bg-accent-light text-accent' : 'text-fg hover:bg-surface-3'
   }`;
 
 function SidebarNav({ onNavigate }) {
@@ -79,21 +79,39 @@ export default function DashboardLayout() {
   }, [menuOpen]);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-surface-2">
       {/* Desktop sidebar */}
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-line bg-surface lg:flex">
-        <div className="flex h-14 items-center px-5 text-base font-semibold">Central Admin</div>
+      <aside className="hidden w-64 shrink-0 flex-col border-r border-line bg-surface lg:flex shadow-soft">
+        <div className="flex h-16 items-center px-5">
+          <div className="flex items-center gap-2">
+            <div className="h-10 w-10 rounded-lg bg-accent flex items-center justify-center">
+              <span className="font-bold text-accent-fg text-lg">E</span>
+            </div>
+            <div>
+              <p className="text-sm font-bold text-fg">EPI</p>
+              <p className="text-xs text-muted">Dashboard</p>
+            </div>
+          </div>
+        </div>
         <SidebarNav />
         <AccountChip />
       </aside>
 
       {/* Tablet / mobile slide-over menu */}
       {menuOpen && (
-        <div className="fixed inset-0 z-40 flex bg-slate-900/50 lg:hidden" onMouseDown={(event) => event.target === event.currentTarget && setMenuOpen(false)}>
-          <aside role="dialog" aria-modal="true" aria-label="Navigation menu" className="flex w-72 max-w-[85vw] flex-col bg-surface shadow-xl">
-            <div className="flex h-14 items-center justify-between px-5">
-              <span className="text-base font-semibold">Central Admin</span>
-              <button type="button" aria-label="Close menu" onClick={() => setMenuOpen(false)} className="rounded-lg p-1.5 text-muted hover:bg-surface-3">
+        <div className="fixed inset-0 z-40 flex bg-black/40 lg:hidden" onMouseDown={(event) => event.target === event.currentTarget && setMenuOpen(false)}>
+          <aside role="dialog" aria-modal="true" aria-label="Navigation menu" className="flex w-72 max-w-[85vw] flex-col bg-surface shadow-hover">
+            <div className="flex h-16 items-center justify-between px-5">
+              <div className="flex items-center gap-2">
+                <div className="h-10 w-10 rounded-lg bg-accent flex items-center justify-center">
+                  <span className="font-bold text-accent-fg text-lg">E</span>
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-fg">EPI</p>
+                  <p className="text-xs text-muted">Dashboard</p>
+                </div>
+              </div>
+              <button type="button" aria-label="Close menu" onClick={() => setMenuOpen(false)} className="rounded-lg p-1.5 text-muted hover:bg-surface-3 transition-smooth">
                 <X className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
@@ -104,11 +122,16 @@ export default function DashboardLayout() {
       )}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-line bg-surface px-4 lg:hidden">
-          <button type="button" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)} className="rounded-lg p-2 hover:bg-surface-3">
+        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-line bg-surface px-4 lg:hidden shadow-soft">
+          <button type="button" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)} className="rounded-lg p-2 text-fg hover:bg-surface-3 transition-smooth">
             <Menu className="h-5 w-5" aria-hidden="true" />
           </button>
-          <span className="font-semibold">Central Admin</span>
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center">
+              <span className="font-bold text-accent-fg text-sm">E</span>
+            </div>
+            <span className="font-semibold text-fg">EPI Dashboard</span>
+          </div>
         </header>
         <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
           <Outlet />

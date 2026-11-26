@@ -23,3 +23,5 @@ coverage/
 
 # Local development admin keys (never commit)
 .dev-access/
+.vercel
+.env*

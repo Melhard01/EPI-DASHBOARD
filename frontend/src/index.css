@@ -2,35 +2,64 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Light / dark design tokens. Components use the semantic names (bg-surface,
-   text-fg, border-line...) so a theme switch is a single class on <html>. */
+/* Premium SaaS design tokens: warm cream, soft gold, dark charcoal.
+   Components use semantic names (bg-surface, text-fg) for easy theme switching. */
 :root {
-  --surface: #ffffff;
-  --surface-2: #f6f7fb;
-  --surface-3: #eceef5;
-  --fg: #0f172a;
-  --muted: #5b6577;
-  --line: #e2e5ee;
-  --accent: #4f46e5;
-  --accent-hover: #4338ca;
-  --accent-fg: #ffffff;
-  --danger: #dc2626;
-  --danger-hover: #b91c1c;
+  /* Backgrounds: warm cream/ivory palette */
+  --surface: #fdfbf7;
+  --surface-2: #faf8f4;
+  --surface-3: #f5f1eb;
+  --surface-4: #ede7dd;
+
+  /* Text: dark charcoal */
+  --fg: #2d2520;
+  --muted: #8b7d73;
+  --muted-light: #bbb3a8;
+
+  /* Borders: subtle warm gray */
+  --line: #e8e0d6;
+
+  /* Accent: soft golden yellow */
+  --accent: #d4a574;
+  --accent-hover: #c49563;
+  --accent-fg: #2d2520;
+  --accent-light: #f5e6d3;
+
+  /* Status colors: soft palette */
+  --success: #86c06b;
+  --success-hover: #7ab35a;
+  --warning: #d9a34a;
+  --warning-hover: #ca9640;
+  --danger: #c85a54;
+  --danger-hover: #b74a47;
+
   color-scheme: light;
 }
 
 .dark {
-  --surface: #121826;
-  --surface-2: #0b101b;
-  --surface-3: #1b2334;
-  --fg: #e6e9f2;
-  --muted: #9aa5ba;
-  --line: #27314a;
-  --accent: #7c83ff;
-  --accent-hover: #9aa0ff;
-  --accent-fg: #0b101b;
-  --danger: #f87171;
-  --danger-hover: #fca5a5;
+  --surface: #1f1b18;
+  --surface-2: #2a2420;
+  --surface-3: #342e28;
+  --surface-4: #3f3730;
+
+  --fg: #f5ede6;
+  --muted: #a89d93;
+  --muted-light: #7a6e64;
+
+  --line: #3f3730;
+
+  --accent: #d4a574;
+  --accent-hover: #e8b896;
+  --accent-fg: #1f1b18;
+  --accent-light: #3f3326;
+
+  --success: #a8d573;
+  --success-hover: #bfe691;
+  --warning: #e8b965;
+  --warning-hover: #f0cc8a;
+  --danger: #d87d75;
+  --danger-hover: #e69c94;
+
   color-scheme: dark;
 }
 
@@ -38,14 +67,27 @@
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
+  --color-surface-4: var(--surface-4);
   --color-fg: var(--fg);
   --color-muted: var(--muted);
+  --color-muted-light: var(--muted-light);
   --color-line: var(--line);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-fg: var(--accent-fg);
+  --color-accent-light: var(--accent-light);
+  --color-success: var(--success);
+  --color-success-hover: var(--success-hover);
+  --color-warning: var(--warning);
+  --color-warning-hover: var(--warning-hover);
   --color-danger: var(--danger);
   --color-danger-hover: var(--danger-hover);
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
 }
 
 html,
@@ -65,6 +107,40 @@ body {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/* Premium shadows and elevation */
+@layer components {
+  .shadow-soft {
+    box-shadow: 0 1px 3px rgba(45, 37, 32, 0.08), 0 1px 2px rgba(45, 37, 32, 0.04);
+  }
+
+  .shadow-elevated {
+    box-shadow: 0 4px 6px -1px rgba(45, 37, 32, 0.1), 0 2px 4px -1px rgba(45, 37, 32, 0.06);
+  }
+
+  .shadow-hover {
+    box-shadow: 0 10px 15px -3px rgba(45, 37, 32, 0.12), 0 4px 6px -2px rgba(45, 37, 32, 0.08);
+  }
+
+  /* Premium button base */
+  .btn {
+    @apply rounded-lg font-medium transition-all duration-200 ease-out;
+  }
+
+  /* Cards with premium styling */
+  .card-premium {
+    @apply rounded-2xl border border-line bg-surface shadow-soft transition-shadow duration-300;
+  }
+
+  .card-premium:hover {
+    @apply shadow-elevated;
+  }
+
+  /* Smooth transitions */
+  .transition-smooth {
+    @apply transition-all duration-200 ease-out;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

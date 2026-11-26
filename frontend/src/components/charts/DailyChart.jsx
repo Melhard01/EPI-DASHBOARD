@@ -14,15 +14,20 @@ export default function DailyChart({ data, days }) {
         <AreaChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: -20 }}>
           <defs>
             <linearGradient id="dailyFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#6366f1" stopOpacity={0.35} />
-              <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+              <stop offset="5%" stopColor="#d4a574" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#d4a574" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#94a3b8" strokeOpacity={0.25} vertical={false} />
-          <XAxis dataKey="date" tickFormatter={shortDate} tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} minTickGap={24} />
-          <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} />
-          <Tooltip labelFormatter={(label) => label} formatter={(value) => [value, 'Submissions']} />
-          <Area type="monotone" dataKey="count" stroke="#6366f1" strokeWidth={2} fill="url(#dailyFill)" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e8e0d6" strokeOpacity={0.4} vertical={false} />
+          <XAxis dataKey="date" tickFormatter={shortDate} tick={{ fontSize: 11, fill: '#8b7d73' }} tickLine={false} axisLine={false} minTickGap={24} />
+          <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#8b7d73' }} tickLine={false} axisLine={false} />
+          <Tooltip
+            labelFormatter={(label) => label}
+            formatter={(value) => [value, 'Submissions']}
+            contentStyle={{ backgroundColor: '#fdfbf7', border: '1px solid #e8e0d6', borderRadius: '0.75rem' }}
+            labelStyle={{ color: '#2d2520' }}
+          />
+          <Area type="monotone" dataKey="count" stroke="#d4a574" strokeWidth={2} fill="url(#dailyFill)" />
         </AreaChart>
       </ResponsiveContainer>
     </div>

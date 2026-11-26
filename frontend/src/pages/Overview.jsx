@@ -20,13 +20,13 @@ const RANGES = [7, 30, 90];
 
 function StatCard({ label, value, hint, to }) {
   const body = (
-    <div className="rounded-xl border border-line bg-surface p-4 shadow-sm sm:p-5">
-      <p className="text-xs font-medium uppercase tracking-wide text-muted">{label}</p>
-      <p className="mt-1 text-3xl font-semibold tabular-nums">{value}</p>
-      {hint && <p className="mt-1 text-xs text-muted">{hint}</p>}
+    <div className="card-premium p-6">
+      <p className="text-xs font-semibold uppercase tracking-widest text-muted">{label}</p>
+      <p className="mt-2 text-4xl font-bold tabular-nums text-fg">{value}</p>
+      {hint && <p className="mt-2 text-xs text-muted-light">{hint}</p>}
     </div>
   );
-  return to ? <Link to={to} className="block rounded-xl transition-shadow hover:shadow-md">{body}</Link> : body;
+  return to ? <Link to={to} className="block transition-smooth">{body}</Link> : body;
 }
 
 function ApplicationCard({ slug, name, stats }) {
@@ -34,20 +34,20 @@ function ApplicationCard({ slug, name, stats }) {
   const forms = application(slug)?.formTypes ?? Object.keys(stats.byFormType);
   return (
     <Card title={name} padded={false}>
-      <dl className="grid grid-cols-3 divide-x divide-line border-b border-line text-center">
+      <dl className="grid grid-cols-3 divide-x divide-line border-b border-line bg-surface-2 text-center">
         {[['Total', stats.total], ['Unread', stats.unread], ['Recent', stats.receivedInPeriod]].map(([label, value]) => (
-          <div key={label} className="px-2 py-3">
-            <dd className="text-xl font-semibold tabular-nums">{value}</dd>
-            <dt className="text-xs text-muted">{label}</dt>
+          <div key={label} className="px-3 py-4 sm:px-4">
+            <dd className="text-2xl font-bold tabular-nums text-fg">{value}</dd>
+            <dt className="mt-1 text-xs font-medium text-muted">{label}</dt>
           </div>
         ))}
       </dl>
       <ul className="divide-y divide-line">
         {forms.map((formType) => (
           <li key={formType}>
-            <Link to={`/apps/${slug}/${formType}`} className="flex items-center justify-between px-4 py-2.5 text-sm hover:bg-surface-2 sm:px-5">
-              <span>{formLabel(formType)}</span>
-              <span className="tabular-nums text-muted">{stats.byFormType[formType] ?? 0}</span>
+            <Link to={`/apps/${slug}/${formType}`} className="flex items-center justify-between px-5 py-3 text-sm font-medium transition-smooth hover:bg-surface-2">
+              <span className="text-fg">{formLabel(formType)}</span>
+              <span className="tabular-nums text-muted font-semibold">{stats.byFormType[formType] ?? 0}</span>
             </Link>
           </li>
         ))}
@@ -73,11 +73,11 @@ function Recent({ applicationName }) {
         <li key={`${item.application}/${item.submissionId}`}>
           <Link
             to={`/submissions?open=${item.application}/${item.formType}/${item.submissionId}`}
-            className="flex items-center gap-3 px-4 py-3 hover:bg-surface-2 sm:px-5"
+            className="flex items-center gap-3 px-5 py-3 transition-smooth hover:bg-surface-2"
           >
-            <span className={`h-2 w-2 shrink-0 rounded-full ${item.isRead ? 'bg-transparent' : 'bg-accent'}`} aria-hidden="true" />
+            <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${item.isRead ? 'bg-transparent' : 'bg-accent'}`} aria-hidden="true" />
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-medium">{contactOf(item.data).title}</span>
+              <span className="block truncate text-sm font-medium text-fg">{contactOf(item.data).title}</span>
               <span className="block truncate text-xs text-muted">{applicationName(item.application)} · {formLabel(item.formType)} · {timeAgo(item.receivedAt)}</span>
             </span>
             <StatusBadge status={item.status} />
