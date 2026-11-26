@@ -81,7 +81,7 @@ export default function DashboardLayout() {
   return (
     <div className="flex min-h-screen" style={{ backgroundColor: 'var(--bg-main)' }}>
       {/* Desktop sidebar */}
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-line bg-surface lg:flex shadow-soft">
+      <aside className="hidden w-64 shrink-0 flex-col border-r border-line bg-surface lg:flex" style={{ boxShadow: '0 1px 3px rgba(45, 37, 32, 0.08)' }}>
         <div className="flex h-16 items-center px-5">
           <div className="flex items-center gap-2">
             <div className="h-10 w-10 rounded-lg bg-accent flex items-center justify-center">
@@ -100,7 +100,7 @@ export default function DashboardLayout() {
       {/* Tablet / mobile slide-over menu */}
       {menuOpen && (
         <div className="fixed inset-0 z-40 flex bg-black/40 lg:hidden" onMouseDown={(event) => event.target === event.currentTarget && setMenuOpen(false)}>
-          <aside role="dialog" aria-modal="true" aria-label="Navigation menu" className="flex w-72 max-w-[85vw] flex-col bg-surface shadow-hover">
+          <aside role="dialog" aria-modal="true" aria-label="Navigation menu" className="flex w-72 max-w-[85vw] flex-col bg-surface" style={{ boxShadow: '0 10px 15px -3px rgba(45, 37, 32, 0.12)' }}>
             <div className="flex h-16 items-center justify-between px-5">
               <div className="flex items-center gap-2">
                 <div className="h-10 w-10 rounded-lg bg-accent flex items-center justify-center">
@@ -122,7 +122,7 @@ export default function DashboardLayout() {
       )}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-line bg-surface px-4 lg:hidden shadow-soft">
+        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-line bg-surface px-4 lg:hidden" style={{ boxShadow: '0 1px 3px rgba(45, 37, 32, 0.08)' }}>
           <button type="button" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)} className="rounded-lg p-2 text-fg hover:bg-surface-3 transition-smooth">
             <Menu className="h-5 w-5" aria-hidden="true" />
           </button>
