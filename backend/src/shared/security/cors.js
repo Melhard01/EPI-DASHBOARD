@@ -101,9 +101,8 @@ export function cors({ apiBase }) {
           ? policy.isAnyPublicAllowed(origin)
           : policy.isPublicAllowed(routeClass.slug, origin);
 
-    // Allow CORS headers for all origins on public endpoints (enforcement is disabled for testing)
-    // Admin routes require auth, so allowing any origin here doesn't weaken security
-    if (allowed || (routeClass.kind === 'admin' && origin) || (routeClass.kind?.startsWith('public') && origin)) {
+    // Allow admin routes from any origin (auth still required for requests)
+    if (allowed || (routeClass.kind === 'admin' && origin)) {
       res.set('Access-Control-Allow-Origin', origin);
       res.set('Access-Control-Expose-Headers', EXPOSED_HEADERS);
       if (routeClass.kind === 'admin') res.set('Access-Control-Allow-Credentials', 'true');
