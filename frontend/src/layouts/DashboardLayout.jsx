@@ -81,15 +81,15 @@ export default function DashboardLayout() {
   return (
     <div className="flex min-h-screen" style={{ backgroundColor: 'var(--bg-main)' }}>
       {/* Desktop sidebar */}
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-line bg-surface lg:flex" style={{ boxShadow: '0 1px 3px rgba(45, 37, 32, 0.08)' }}>
+      <aside className="hidden w-64 shrink-0 flex-col border-r border-line bg-surface lg:flex" style={{ boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)' }}>
         <div className="flex h-16 items-center px-5">
           <div className="flex items-center gap-2">
             <div className="h-10 w-10 rounded-lg bg-accent flex items-center justify-center">
-              <span className="font-bold text-accent-fg text-lg">E</span>
+              <span className="font-600 text-accent-fg text-lg">E</span>
             </div>
             <div>
-              <p className="text-sm font-bold text-fg">EPI</p>
-              <p className="text-xs text-muted">Dashboard</p>
+              <p className="text-sm font-600 text-fg">EPI</p>
+              <p className="text-xs font-400 text-muted">Dashboard</p>
             </div>
           </div>
         </div>

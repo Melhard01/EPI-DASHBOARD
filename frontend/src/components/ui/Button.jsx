@@ -6,9 +6,9 @@ const VARIANTS = {
 };
 
 const SIZES = {
-  sm: 'h-8 px-3 text-sm',
-  md: 'h-10 px-4 text-sm font-medium',
-  lg: 'h-12 px-6 text-base font-semibold',
+  sm: 'h-8 px-3 text-sm font-500',
+  md: 'h-10 px-4 text-sm font-500',
+  lg: 'h-12 px-6 text-base font-600',
 };
 
 export default function Button({ variant = 'secondary', size = 'md', className = '', type = 'button', loading = false, disabled = false, children, ...props }) {

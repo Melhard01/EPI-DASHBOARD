@@ -21,9 +21,9 @@ const RANGES = [7, 30, 90];
 function StatCard({ label, value, hint, to }) {
   const body = (
     <div className="card-premium p-6">
-      <p className="text-xs font-semibold uppercase tracking-widest text-muted">{label}</p>
-      <p className="mt-2 text-4xl font-bold tabular-nums text-fg">{value}</p>
-      {hint && <p className="mt-2 text-xs text-muted-light">{hint}</p>}
+      <p className="text-xs font-400 uppercase tracking-wider text-muted">{label}</p>
+      <p className="mt-3 text-5xl font-300 tabular-nums text-fg">{value}</p>
+      {hint && <p className="mt-2 text-xs font-400 text-muted">{hint}</p>}
     </div>
   );
   return to ? <Link to={to} className="block transition-smooth">{body}</Link> : body;
@@ -37,8 +37,8 @@ function ApplicationCard({ slug, name, stats }) {
       <dl className="grid grid-cols-3 divide-x divide-line border-b border-line bg-surface-2 text-center">
         {[['Total', stats.total], ['Unread', stats.unread], ['Recent', stats.receivedInPeriod]].map(([label, value]) => (
           <div key={label} className="px-3 py-4 sm:px-4">
-            <dd className="text-2xl font-bold tabular-nums text-fg">{value}</dd>
-            <dt className="mt-1 text-xs font-medium text-muted">{label}</dt>
+            <dd className="text-2xl font-400 tabular-nums text-fg">{value}</dd>
+            <dt className="mt-1 text-xs font-400 text-muted">{label}</dt>
           </div>
         ))}
       </dl>
@@ -104,8 +104,8 @@ export default function Overview() {
   const header = (
     <div className="flex flex-wrap items-end justify-between gap-3">
       <div>
-        <h1 className="text-xl font-semibold">Overview</h1>
-        <p className="mt-1 text-sm text-muted">Activity across {applications.length === 1 ? 'your website' : 'all the websites you can access'}.</p>
+        <h1 className="text-3xl font-300 text-fg">Overview</h1>
+        <p className="mt-2 text-sm font-400 text-muted">Activity across {applications.length === 1 ? 'your website' : 'all the websites you can access'}.</p>
       </div>
       <label className="flex items-center gap-2 text-sm text-muted">
         Period
