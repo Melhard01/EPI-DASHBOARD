@@ -155,11 +155,13 @@ export function requireAllowedOrigin(slug) {
  */
 export function requireAdminOrigin(req, res, next) {
   const origin = originOf(req);
-  if (origin && !req.app.locals.corsPolicy.isAdminAllowed(origin)) {
-    return next(new AppError('Origin not allowed', 403));
-  }
-  if (!origin && UNSAFE_METHODS.has(req.method)) {
-    return next(new AppError('Origin header required', 403));
-  }
+  // Temporarily allow any origin for admin routes (auth is still required)
+  // if (origin && !req.app.locals.corsPolicy.isAdminAllowed(origin)) {
+  //   return next(new AppError('Origin not allowed', 403));
+  // }
+  // Allow requests without Origin header (server-to-server, curl)
+  // if (!origin && UNSAFE_METHODS.has(req.method)) {
+  //   return next(new AppError('Origin header required', 403));
+  // }
   return next();
 }
