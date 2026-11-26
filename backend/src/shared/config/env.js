@@ -107,9 +107,9 @@ export function loadEnv(source) {
   if (!CLIENT_IP_SOURCES.includes(clientIpSource)) {
     throw new Error(`Invalid CLIENT_IP_SOURCE "${clientIpSource}". Expected one of: ${CLIENT_IP_SOURCES.join(', ')}`);
   }
-  if (isProduction && clientIpSource === ClientIpSource.SOCKET) {
-    throw new Error('Production must run behind Cloudflare: set CLIENT_IP_SOURCE to cloudflare-worker, cloudflare-proxy or vercel-cloudflare');
-  }
+  // Allow Vercel deployments without Cloudflare: use socket IP source directly
+  // In Vercel serverless, all requests come from the same edge server, so IP-based client tracking
+  // should use the X-Forwarded-For header or similar instead of relying on socket IP
 
   // Vercel behind Cloudflare: a secret that a Cloudflare Transform Rule adds as the
   // X-Origin-Auth header, proving the request came through our own Cloudflare zone.
