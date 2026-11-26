@@ -9,15 +9,15 @@
 export const formRateLimits = Object.freeze({
   // Short window stops bursts; daily window stops slow, sustained abuse.
   demo: [
-    { limit: 5, windowSeconds: 10 * 60 },
-    { limit: 20, windowSeconds: 24 * 60 * 60 },
+    { limit: 50, windowSeconds: 10 * 60 },
+    { limit: 500, windowSeconds: 24 * 60 * 60 },
   ],
   sales: [
-    { limit: 5, windowSeconds: 10 * 60 },
-    { limit: 20, windowSeconds: 24 * 60 * 60 },
+    { limit: 50, windowSeconds: 10 * 60 },
+    { limit: 500, windowSeconds: 24 * 60 * 60 },
   ],
   partnerships: [
-    { limit: 3, windowSeconds: 10 * 60 },
-    { limit: 10, windowSeconds: 24 * 60 * 60 },
+    { limit: 30, windowSeconds: 10 * 60 },
+    { limit: 100, windowSeconds: 24 * 60 * 60 },
   ],
 });
