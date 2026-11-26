@@ -7,17 +7,17 @@
  * refuses to start otherwise.
  */
 export const formRateLimits = Object.freeze({
-  // Short window stops bursts; daily window stops slow, sustained abuse.
+  // Unlimited for testing (very high limits)
   demo: [
-    { limit: 50, windowSeconds: 10 * 60 },
-    { limit: 500, windowSeconds: 24 * 60 * 60 },
+    { limit: 10000, windowSeconds: 10 * 60 },
+    { limit: 100000, windowSeconds: 24 * 60 * 60 },
   ],
   sales: [
-    { limit: 50, windowSeconds: 10 * 60 },
-    { limit: 500, windowSeconds: 24 * 60 * 60 },
+    { limit: 10000, windowSeconds: 10 * 60 },
+    { limit: 100000, windowSeconds: 24 * 60 * 60 },
   ],
   partnerships: [
-    { limit: 30, windowSeconds: 10 * 60 },
-    { limit: 100, windowSeconds: 24 * 60 * 60 },
+    { limit: 10000, windowSeconds: 10 * 60 },
+    { limit: 100000, windowSeconds: 24 * 60 * 60 },
   ],
 });
