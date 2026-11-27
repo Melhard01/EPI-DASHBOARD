@@ -161,8 +161,8 @@ export default function TeamManagement() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold" style={{ color: '#000000' }}>Team management</h1>
-          <p className="mt-1 text-sm" style={{ color: '#000000' }}>Who can sign in, and which websites each person can manage.</p>
+          <h1 className="text-lg sm:text-xl md:text-2xl font-semibold" style={{ color: '#000000' }}>Team management</h1>
+          <p className="mt-1 text-xs sm:text-sm md:text-base" style={{ color: '#000000' }}>Who can sign in, and which websites each person can manage.</p>
         </div>
         <Button variant="primary" onClick={() => setEditing('new')}>
           <Plus className="h-4 w-4" aria-hidden="true" /> Add administrator
@@ -177,7 +177,7 @@ export default function TeamManagement() {
         {users.data && users.data.items.length === 0 && <EmptyState icon={UserCog} title="No administrators" description="Add the first administrator to get started." />}
         {users.data && users.data.items.length > 0 && (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[22rem] text-left text-sm">
+            <table className="w-full min-w-[22rem] text-left text-xs sm:text-sm">
               <thead className="border-b border-line text-xs uppercase tracking-wide text-muted">
                 <tr>
                   <th scope="col" className="px-4 py-3 font-medium sm:px-5">Administrator</th>

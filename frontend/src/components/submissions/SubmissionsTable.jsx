@@ -10,7 +10,7 @@ import { formatDateTime, timeAgo } from '../../lib/format.js';
 export default function SubmissionsTable({ items, showForm, applicationName, onOpen }) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[20rem] text-left text-sm">
+      <table className="w-full min-w-[20rem] text-left text-xs sm:text-sm">
         <thead className="border-b border-line text-xs uppercase tracking-wide text-muted">
           <tr>
             <th scope="col" className="px-4 py-3 font-medium sm:px-5">Contact</th>

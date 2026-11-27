@@ -46,8 +46,8 @@ export default function AuditLogs() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-semibold" style={{ color: '#000000' }}>Audit logs</h1>
-        <p className="mt-1 text-sm" style={{ color: '#000000' }}>Every status change, deletion and change to administrators. Entries never contain submitted personal data.</p>
+        <h1 className="text-lg sm:text-xl md:text-2xl font-semibold" style={{ color: '#000000' }}>Audit logs</h1>
+        <p className="mt-1 text-xs sm:text-sm md:text-base" style={{ color: '#000000' }}>Every status change, deletion and change to administrators. Entries never contain submitted personal data.</p>
       </div>
 
       <Card padded={false}>
@@ -74,7 +74,7 @@ export default function AuditLogs() {
         {query.data && query.data.items.length > 0 && (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[26rem] text-left text-sm">
+              <table className="w-full min-w-[26rem] text-left text-xs sm:text-sm">
                 <thead className="border-b border-line text-xs uppercase tracking-wide text-muted">
                   <tr>
                     <th scope="col" className="px-4 py-3 font-medium sm:px-5">When</th>

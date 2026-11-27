@@ -20,10 +20,10 @@ const RANGES = [7, 30, 90];
 
 function StatCard({ label, value, hint, to }) {
   const body = (
-    <div className="card-premium p-6">
-      <p className="text-xs font-400 uppercase tracking-wider text-muted">{label}</p>
-      <p className="mt-3 text-5xl font-300 tabular-nums text-fg">{value}</p>
-      {hint && <p className="mt-2 text-xs font-400 text-muted">{hint}</p>}
+    <div className="card-premium p-4 sm:p-5 md:p-6">
+      <p className="text-xs sm:text-xs md:text-sm font-400 uppercase tracking-wider text-muted">{label}</p>
+      <p className="mt-3 text-3xl sm:text-4xl md:text-5xl font-300 tabular-nums text-fg">{value}</p>
+      {hint && <p className="mt-2 text-xs sm:text-xs md:text-sm font-400 text-muted">{hint}</p>}
     </div>
   );
   return to ? <Link to={to} className="block transition-smooth">{body}</Link> : body;
@@ -36,16 +36,16 @@ function ApplicationCard({ slug, name, stats }) {
     <Card title={name} padded={false}>
       <dl className="grid grid-cols-3 divide-x divide-line border-b border-line bg-surface-2 text-center">
         {[['Total', stats.total], ['Unread', stats.unread], ['Recent', stats.receivedInPeriod]].map(([label, value]) => (
-          <div key={label} className="px-3 py-4 sm:px-4">
-            <dd className="text-2xl font-400 tabular-nums text-fg">{value}</dd>
-            <dt className="mt-1 text-xs font-400 text-muted">{label}</dt>
+          <div key={label} className="px-2 py-3 sm:px-3 sm:py-4 md:px-4">
+            <dd className="text-lg sm:text-xl md:text-2xl font-400 tabular-nums text-fg">{value}</dd>
+            <dt className="mt-1 text-xs sm:text-xs md:text-sm font-400 text-muted">{label}</dt>
           </div>
         ))}
       </dl>
       <ul className="divide-y divide-line">
         {forms.map((formType) => (
           <li key={formType}>
-            <Link to={`/apps/${slug}/${formType}`} className="flex items-center justify-between px-5 py-3 text-sm font-medium transition-smooth hover:bg-surface-2">
+            <Link to={`/apps/${slug}/${formType}`} className="flex items-center justify-between px-3 py-2 sm:px-4 sm:py-2.5 md:px-5 md:py-3 text-xs sm:text-sm font-medium transition-smooth hover:bg-surface-2">
               <span className="text-fg">{formLabel(formType)}</span>
               <span className="tabular-nums text-muted font-semibold">{stats.byFormType[formType] ?? 0}</span>
             </Link>
@@ -104,8 +104,8 @@ export default function Overview() {
   const header = (
     <div className="flex flex-wrap items-end justify-between gap-3">
       <div>
-        <h1 className="text-3xl font-300" style={{ color: '#000000' }}>Overview</h1>
-        <p className="mt-2 text-sm font-400" style={{ color: '#000000' }}>Activity across {applications.length === 1 ? 'your website' : 'all the websites you can access'}.</p>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-300" style={{ color: '#000000' }}>Overview</h1>
+        <p className="mt-2 text-xs sm:text-sm md:text-base font-400" style={{ color: '#000000' }}>Activity across {applications.length === 1 ? 'your website' : 'all the websites you can access'}.</p>
       </div>
       <label className="flex items-center gap-2 text-sm text-muted">
         Period
