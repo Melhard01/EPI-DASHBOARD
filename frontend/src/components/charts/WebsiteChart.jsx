@@ -2,6 +2,19 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 const PALETTE = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#06b6d4', '#8b5cf6'];
 
+/** Custom responsive tooltip for the pie chart */
+function ResponsiveTooltip({ active, payload }) {
+  if (active && payload?.length) {
+    return (
+      <div className="rounded-lg bg-surface border border-line px-2 py-1 sm:px-3 sm:py-1.5 shadow-elevated">
+        <p className="text-xs sm:text-sm font-medium text-fg">{payload[0].name}</p>
+        <p className="text-xs sm:text-sm text-muted">{payload[0].value} submissions</p>
+      </div>
+    );
+  }
+  return null;
+}
+
 /** Share of all submissions per website (only useful with more than one website). */
 export default function WebsiteChart({ totals }) {
   const data = Object.entries(totals).map(([name, value]) => ({ name, value })).filter((d) => d.value > 0);
@@ -27,7 +40,7 @@ export default function WebsiteChart({ totals }) {
             >
               {data.map((entry, i) => <Cell key={entry.name} fill={PALETTE[i % PALETTE.length]} />)}
             </Pie>
-            <Tooltip formatter={(value) => `${value} submissions`} />
+            <Tooltip content={<ResponsiveTooltip />} />
           </PieChart>
         </ResponsiveContainer>
       </div>
