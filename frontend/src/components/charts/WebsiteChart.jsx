@@ -7,12 +7,12 @@ export default function WebsiteChart({ totals }) {
   const data = Object.entries(totals).map(([name, value]) => ({ name, value })).filter((d) => d.value > 0);
   const summary = data.map((d) => `${d.name}: ${d.value}`).join(', ');
   return (
-    <div className="flex w-full flex-col items-center gap-4 md:gap-6 lg:flex-row lg:items-start">
+    <div className="flex w-full flex-col items-center justify-center gap-4 p-4 sm:gap-6 sm:p-6 lg:flex-row lg:items-start lg:justify-start lg:p-0">
       {/* Responsive Chart Container */}
       <div
         role="img"
         aria-label={`Submissions per website: ${summary || 'none'}`}
-        className="h-40 w-40 shrink-0 sm:h-48 sm:w-48 lg:h-56 lg:w-56"
+        className="h-48 w-48 shrink-0 sm:h-56 sm:w-56 lg:h-64 lg:w-64"
       >
         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <PieChart>
@@ -33,18 +33,18 @@ export default function WebsiteChart({ totals }) {
       </div>
 
       {/* Responsive Legend */}
-      <ul className="w-full space-y-2 text-sm md:space-y-3 md:text-base lg:w-auto lg:flex-1">
+      <ul className="w-full space-y-2.5 text-sm sm:space-y-3 sm:text-base lg:w-auto lg:flex-1 lg:pl-4">
         {data.map((entry, i) => (
-          <li key={entry.name} className="flex items-center justify-between gap-3 md:gap-4">
-            <span className="flex items-center gap-2">
+          <li key={entry.name} className="flex items-center justify-between gap-3 sm:gap-4 py-1">
+            <span className="flex items-center gap-2 min-w-0">
               <span
-                className="h-2.5 w-2.5 shrink-0 rounded-full md:h-3 md:w-3"
+                className="h-3 w-3 shrink-0 rounded-full sm:h-3.5 sm:w-3.5"
                 style={{ background: PALETTE[i % PALETTE.length] }}
                 aria-hidden="true"
               />
               <span className="truncate font-medium">{entry.name}</span>
             </span>
-            <span className="shrink-0 font-semibold tabular-nums">{entry.value}</span>
+            <span className="shrink-0 font-semibold tabular-nums ml-2">{entry.value}</span>
           </li>
         ))}
       </ul>
