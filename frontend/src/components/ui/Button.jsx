@@ -1,8 +1,8 @@
 const VARIANTS = {
-  primary: 'bg-accent text-accent-fg hover:bg-accent-hover shadow hover:shadow-md',
-  secondary: 'border border-line bg-surface-2 text-fg hover:bg-surface-3 shadow hover:shadow-md',
-  ghost: 'text-fg hover:bg-surface-3',
-  danger: 'bg-danger text-white hover:bg-danger-hover shadow hover:shadow-md',
+  primary: 'bg-accent text-accent-fg hover:bg-accent-hover shadow-soft hover:shadow-elevated transition-all duration-250',
+  secondary: 'border border-line bg-surface-2 text-fg hover:bg-surface-3 shadow-soft hover:shadow-soft transition-all duration-250',
+  ghost: 'text-fg hover:bg-surface-3 transition-all duration-250',
+  danger: 'bg-danger text-white hover:bg-danger-hover shadow-soft hover:shadow-elevated transition-all duration-250',
 };
 
 const SIZES = {
