@@ -89,5 +89,27 @@ export function createSubmissionsRouter(applications) {
     })
     .all(methodNotAllowed(['POST']));
 
+  // Path-based convenience endpoint: POST /api/v1/submissions/:application/:formType
+  router
+    .route('/:application/:formType')
+    .post(requireJson, (req, res, next) => {
+      const { application, formType } = req.params;
+      const app = applicationsBySlug.get(application);
+      if (!app) {
+        return res.status(404).json({
+          status: 'error',
+          message: `Application not found: ${application}`,
+        });
+      }
+      if (!app.formHandlers.has(formType)) {
+        return res.status(404).json({
+          status: 'error',
+          message: `Form type not found: ${formType}`,
+        });
+      }
+      runChain(app.formHandlers.get(formType), req, res, next);
+    })
+    .all(methodNotAllowed(['POST']));
+
   return router;
 }
