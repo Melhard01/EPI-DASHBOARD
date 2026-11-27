@@ -30,6 +30,7 @@ export const api = {
     list: (signal) => request('/users', { signal }),
     create: (body) => request('/users', { method: 'POST', body }),
     update: (id, body) => request(`/users/${seg(id)}`, { method: 'PATCH', body }),
+    delete: (id) => request(`/users/${seg(id)}`, { method: 'DELETE' }),
   },
 
   audit: {

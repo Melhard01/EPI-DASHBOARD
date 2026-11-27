@@ -37,7 +37,7 @@ import {
   statsFor,
   SORT_COLUMNS,
 } from './submissions.repository.js';
-import { listUsers, createUser, updateUser } from './users.repository.js';
+import { listUsers, createUser, updateUser, deleteUser } from './users.repository.js';
 import { listAudit } from './audit.repository.js';
 import { loginAdmin } from './login.repository.js';
 
@@ -319,7 +319,13 @@ export function createAdminRouter({ applications, jwtSecret, jwtExpiryHours }) {
       if (!user) throw new AppError('Admin user not found', 404);
       return sendSuccess(res, { message: 'Admin user updated', data: { data: user } });
     })
-    .all(methodNotAllowed(['PATCH']));
+    .delete(requireSuperAdmin, async (req, res) => {
+      if (!isUuid(req.params.id)) throw new AppError('Invalid user ID', 400);
+      const result = await deleteUser(req.params.id.toLowerCase(), req.admin.id);
+      if (!result) throw new AppError('Admin user not found', 404);
+      return sendSuccess(res, { statusCode: 204, message: 'Admin user deleted', data: null });
+    })
+    .all(methodNotAllowed(['PATCH', 'DELETE']));
 
   // ------------------------------------------------- audit (Super Admin)
   router

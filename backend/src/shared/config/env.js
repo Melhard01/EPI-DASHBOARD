@@ -183,6 +183,22 @@ export function loadEnv(source) {
   }
   const adminOrigins = parseOrigins(source.ADMIN_ALLOWED_ORIGINS);
 
+
+  // --- Email configuration -----------------------------------------------
+  const resendApiKey = source.RESEND_API_KEY || null;
+  const adminDashboardUrl = source.ADMIN_DASHBOARD_URL || null;
+  const invitationExpiryHours = Number(source.INVITATION_EXPIRY_HOURS) || 24;
+
+  if (invitationExpiryHours < 1 || invitationExpiryHours > 365) {
+    throw new Error("INVITATION_EXPIRY_HOURS must be between 1 and 365");
+  }
+
+  if (isProduction && !resendApiKey) {
+    throw new Error("RESEND_API_KEY is required in production");
+  }
+  if (isProduction && !adminDashboardUrl) {
+    throw new Error("ADMIN_DASHBOARD_URL is required in production");
+  }
   return Object.freeze({
     nodeEnv,
     isProduction,
@@ -205,6 +221,9 @@ export function loadEnv(source) {
     rateLimitStore,
     // Outside production a missing secret gets a random per-process value.
     rateLimitSecret,
+    resendApiKey,
+    adminDashboardUrl,
+    invitationExpiryHours,
   });
 }
 

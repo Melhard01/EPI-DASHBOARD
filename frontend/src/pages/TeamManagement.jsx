@@ -144,7 +144,18 @@ export default function TeamManagement() {
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
   });
 
+  const deleteAdmin = useMutation({
+    mutationFn: (id) => api.users.delete(id),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
+  });
+
   const applicationName = (slug) => applications.find((a) => a.slug === slug)?.name ?? slug;
+
+  const handleDelete = (user) => {
+    if (confirm(`Delete administrator "${user.displayName || user.email}"? This cannot be undone.`)) {
+      deleteAdmin.mutate(user.id);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -158,7 +169,7 @@ export default function TeamManagement() {
         </Button>
       </div>
 
-      <InlineError>{toggleStatus.error?.message}</InlineError>
+      <InlineError>{toggleStatus.error?.message || deleteAdmin.error?.message}</InlineError>
 
       <Card padded={false}>
         {users.isPending && <div className="space-y-3 p-5" role="status" aria-label="Loading administrators">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-12" />)}</div>}
@@ -204,6 +215,16 @@ export default function TeamManagement() {
                             aria-label={`${disabled ? 'Enable' : 'Disable'} ${user.email}`}
                           >
                             {disabled ? 'Enable' : 'Disable'}
+                          </Button>
+                          <Button
+                            size="sm"
+                            disabled={isMe || deleteAdmin.isPending}
+                            title={isMe ? 'You cannot delete your own account' : undefined}
+                            onClick={() => handleDelete(user)}
+                            variant="danger"
+                            aria-label={`Delete ${user.email}`}
+                          >
+                            Delete
                           </Button>
                         </div>
                       </td>

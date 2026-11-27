@@ -39,3 +39,26 @@ export function requireSuperAdmin(req, res, next) {
   }
   return next();
 }
+
+/**
+ * Validates that an inviter can grant the requested permissions.
+ * This runs before invitation creation to prevent privilege escalation.
+ */
+export function validateInvitationPermissions(inviter, isSuperAdmin, applications) {
+  // Only Super Admins can invite Super Admins
+  if (isSuperAdmin && !inviter.isSuperAdmin) {
+    throw new AppError('Only Super Admins can invite other Super Admins', 403);
+  }
+
+  // Website-specific admins cannot grant access outside their scope
+  if (!inviter.isSuperAdmin) {
+    const inviterApps = new Set(inviter.applications);
+    const unauthorized = applications.filter((app) => !inviterApps.has(app));
+    if (unauthorized.length > 0) {
+      throw new AppError(
+        `You cannot grant access to ${unauthorized.join(', ')}. You can only manage: ${inviter.applications.join(', ')}`,
+        403,
+      );
+    }
+  }
+}

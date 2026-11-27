@@ -151,3 +151,55 @@ export async function updateUser(id, changes, actorId) {
     return fetchUser(client, id);
   });
 }
+
+/**
+ * Deletes an admin user permanently.
+ * Guards: Cannot delete yourself, cannot delete last Super Admin.
+ * Cascades: Deletes app access, audit entries still reference the user by ID.
+ */
+export async function deleteUser(id, actorId) {
+  return database.withTransaction(async (client) => {
+    const { rows } = await client.query(
+      `SELECT id, is_super_admin, status, email FROM platform_admin.admin_users WHERE id = $1 FOR UPDATE`,
+      [id],
+    );
+    if (rows.length === 0) return null;
+    const user = rows[0];
+
+    // Cannot delete yourself
+    if (id === actorId) {
+      throw new AppError('You cannot delete your own account', 409);
+    }
+
+    // Cannot delete if it's the last active Super Admin
+    if (user.is_super_admin && user.status === 'active') {
+      const others = await client.query(
+        `SELECT id FROM platform_admin.admin_users
+         WHERE is_super_admin AND status = 'active' AND id <> $1 FOR UPDATE`,
+        [id],
+      );
+      if (others.rowCount === 0) {
+        throw new AppError('At least one active Super Admin must remain', 409);
+      }
+    }
+
+    // Delete app access (cascaded by FK in some cases, explicit here for clarity)
+    await client.query(`DELETE FROM platform_admin.admin_app_access WHERE user_id = $1`, [id]);
+
+    // Delete the user
+    await client.query(`DELETE FROM platform_admin.admin_users WHERE id = $1`, [id]);
+
+    // Audit
+    await insertAudit(client, {
+      actorId,
+      action: 'admin_user.deleted',
+      targetUserId: id,
+      details: {
+        email: user.email,
+        isSuperAdmin: user.is_super_admin,
+      },
+    });
+
+    return { email: user.email };
+  });
+}
