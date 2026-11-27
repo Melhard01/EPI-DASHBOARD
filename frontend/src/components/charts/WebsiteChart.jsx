@@ -46,21 +46,21 @@ export default function WebsiteChart({ totals }) {
       </div>
 
       {/* Responsive Legend */}
-      <ul className="w-full space-y-2.5 text-sm sm:space-y-3 sm:text-base lg:w-auto lg:flex-1 lg:pl-4">
+      <div className="w-full space-y-2 sm:space-y-2.5 lg:w-auto lg:flex-1 lg:pl-6">
         {data.map((entry, i) => (
-          <li key={entry.name} className="flex items-center justify-between gap-3 sm:gap-4 py-1">
-            <span className="flex items-center gap-2 min-w-0">
+          <div key={entry.name} className="flex items-center justify-between gap-3 sm:gap-4 px-3 py-2 sm:py-2.5 rounded-lg bg-surface-2 hover:bg-surface-3 transition-colors">
+            <span className="flex items-center gap-2 min-w-0 flex-1">
               <span
                 className="h-3 w-3 shrink-0 rounded-full sm:h-3.5 sm:w-3.5"
                 style={{ background: PALETTE[i % PALETTE.length] }}
                 aria-hidden="true"
               />
-              <span className="truncate font-medium">{entry.name}</span>
+              <span className="text-xs sm:text-sm truncate font-medium text-fg">{entry.name}</span>
             </span>
-            <span className="shrink-0 font-semibold tabular-nums ml-2">{entry.value}</span>
-          </li>
+            <span className="shrink-0 text-xs sm:text-sm font-semibold tabular-nums text-fg ml-2">{entry.value}</span>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
