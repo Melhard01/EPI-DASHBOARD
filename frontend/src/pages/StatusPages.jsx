@@ -9,7 +9,7 @@ function Screen({ icon: Icon, title, children, actions, fullPage = false }) {
         <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-surface-3 text-muted">
           <Icon className="h-6 w-6" aria-hidden="true" />
         </span>
-        <h1 className="text-lg font-semibold">{title}</h1>
+        <h1 className="text-lg font-semibold" style={{ color: '#000000' }}>{title}</h1>
         <div className="mt-2 space-y-2 text-sm text-muted">{children}</div>
         {actions && <div className="mt-6 flex justify-center gap-2">{actions}</div>}
       </div>

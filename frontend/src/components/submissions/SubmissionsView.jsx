@@ -118,7 +118,7 @@ export default function SubmissionsView({ title, description, fixedApplication, 
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-semibold">{title}</h1>
+        <h1 className="text-xl font-semibold" style={{ color: '#000000' }}>{title}</h1>
         {description && <p className="mt-1 text-sm text-muted">{description}</p>}
       </div>
 
