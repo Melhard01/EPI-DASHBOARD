@@ -79,7 +79,8 @@ export default function DashboardLayout() {
   }, [menuOpen]);
 
   return (
-    <div className="flex min-h-screen" style={{ backgroundColor: 'var(--bg-main)' }}>
+    <div className="flex min-h-screen bg-purple-500" style={{ backgroundColor: '#9670d9' }}>
+      <div className="flex w-full flex-col lg:flex-row rounded-3xl overflow-hidden" style={{ backgroundColor: 'var(--bg-main)', margin: '20px' }}>
       {/* Desktop sidebar */}
       <aside className="hidden w-64 shrink-0 flex-col border-r border-line bg-surface lg:flex transition-all duration-300" style={{ boxShadow: '0 2px 8px rgba(150, 112, 217, 0.06)' }}>
         <div className="flex h-16 items-center px-5">
@@ -136,6 +137,7 @@ export default function DashboardLayout() {
         <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
           <Outlet />
         </main>
+      </div>
       </div>
     </div>
   );
