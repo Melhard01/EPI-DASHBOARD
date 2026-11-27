@@ -193,9 +193,6 @@ export function loadEnv(source) {
     throw new Error("INVITATION_EXPIRY_HOURS must be between 1 and 365");
   }
 
-  if (isProduction && !resendApiKey) {
-    throw new Error("RESEND_API_KEY is required in production");
-  }
   if (isProduction && !adminDashboardUrl) {
     throw new Error("ADMIN_DASHBOARD_URL is required in production");
   }
