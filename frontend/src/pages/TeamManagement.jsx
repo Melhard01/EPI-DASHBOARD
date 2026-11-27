@@ -82,7 +82,7 @@ function UserFormModal({ user, applications, onClose }) {
         <button type="submit" tabIndex={-1} aria-hidden="true" className="sr-only">Submit</button>
         <InlineError>{generalError}</InlineError>
         {isNew ? (
-          <TextInput label="Email" type="email" required autoComplete="off" value={form.email} onChange={(e) => set({ email: e.target.value })} error={fieldErrors.email} hint="Must be the email they sign in with through Cloudflare Access." />
+          <TextInput label="Email" type="email" required autoComplete="off" value={form.email} onChange={(e) => set({ email: e.target.value })} error={fieldErrors.email} hint="Must be the email they sign in with." />
         ) : (
           <p className="text-sm"><span className="text-muted">Email: </span>{user.email}</p>
         )}
