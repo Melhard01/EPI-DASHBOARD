@@ -104,7 +104,7 @@ export default function Overview() {
   const header = (
     <div className="flex flex-wrap items-end justify-between gap-3">
       <div>
-        <h1 className="text-3xl font-300 text-fg">Overview</h1>
+        <h1 className="text-3xl font-300" style={{ color: '#000000' }}>Overview</h1>
         <p className="mt-2 text-sm font-400 text-muted">Activity across {applications.length === 1 ? 'your website' : 'all the websites you can access'}.</p>
       </div>
       <label className="flex items-center gap-2 text-sm text-muted">

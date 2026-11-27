@@ -46,7 +46,7 @@ export default function AuditLogs() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-semibold">Audit logs</h1>
+        <h1 className="text-xl font-semibold" style={{ color: '#000000' }}>Audit logs</h1>
         <p className="mt-1 text-sm text-muted">Every status change, deletion and change to administrators. Entries never contain submitted personal data.</p>
       </div>
 
