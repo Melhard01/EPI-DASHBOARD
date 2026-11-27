@@ -47,7 +47,7 @@ export default function AuditLogs() {
     <div className="space-y-4">
       <div>
         <h1 className="text-xl font-semibold" style={{ color: '#000000' }}>Audit logs</h1>
-        <p className="mt-1 text-sm text-muted">Every status change, deletion and change to administrators. Entries never contain submitted personal data.</p>
+        <p className="mt-1 text-sm" style={{ color: '#000000' }}>Every status change, deletion and change to administrators. Entries never contain submitted personal data.</p>
       </div>
 
       <Card padded={false}>

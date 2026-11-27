@@ -22,7 +22,7 @@ export default function Settings() {
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-semibold" style={{ color: '#000000' }}>Settings</h1>
-        <p className="mt-1 text-sm text-muted">Your account and how the dashboard looks for you.</p>
+        <p className="mt-1 text-sm" style={{ color: '#000000' }}>Your account and how the dashboard looks for you.</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">

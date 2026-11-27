@@ -119,7 +119,7 @@ export default function SubmissionsView({ title, description, fixedApplication, 
     <div className="space-y-4">
       <div>
         <h1 className="text-xl font-semibold" style={{ color: '#000000' }}>{title}</h1>
-        {description && <p className="mt-1 text-sm text-muted">{description}</p>}
+        {description && <p className="mt-1 text-sm" style={{ color: '#000000' }}>{description}</p>}
       </div>
 
       <Card padded={false} aria-busy={query.isFetching || undefined}>

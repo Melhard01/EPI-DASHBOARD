@@ -151,7 +151,7 @@ export default function TeamManagement() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold" style={{ color: '#000000' }}>Team management</h1>
-          <p className="mt-1 text-sm text-muted">Who can sign in, and which websites each person can manage.</p>
+          <p className="mt-1 text-sm" style={{ color: '#000000' }}>Who can sign in, and which websites each person can manage.</p>
         </div>
         <Button variant="primary" onClick={() => setEditing('new')}>
           <Plus className="h-4 w-4" aria-hidden="true" /> Add administrator
